@@ -52,7 +52,7 @@ const Footer = () => {
           </Typography>
           <Stack
             sx={{
-              // flexDirection: { xs: "column", md: "row" },
+              flexDirection: { xs: "column", md: "row" },
               borderRadius: "16px",
               padding: "12px",
               bgcolor: "#fff",
