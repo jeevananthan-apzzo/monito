@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Header from "./Header";
 import Footer from "./Footer";
+import { Stack } from "@mui/material";
 
 export const monitoFont = localFont({
   src: [
@@ -51,11 +52,11 @@ const monitoTheme = createTheme({
 const Layout = ({ children }: any) => {
   return (
     <ThemeProvider theme={monitoTheme}>
-      <div className={monitoFont.className}>
+      <Stack className={monitoFont.className} sx={{minHeight: "100vh"}}>
         <Header />
-        <main>{children}</main>
+        <main style={{flexGrow: "1"}}>{children}</main>
         <Footer />
-      </div>
+      </Stack>
     </ThemeProvider>
   );
 };
