@@ -12,11 +12,10 @@ const PrimaryButton = ({ text, variant = "contained" }: PrimaryButtonProps) => {
       variant={variant}
       sx={{
         borderRadius: "57px",
-        fontSize: "16px",
+        fontSize: {xs: "10px" , md: "16px"},
         fontWeight: "bold",
         textTransform: "none",
         padding: "10px 29px",
-        lineHeight: "24px",
       }}
     >
       {text}

@@ -23,6 +23,7 @@ import ProductCard from "@/components/ProductCard";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { loadProducts } from "@/lib/load_products";
 import { useEffect } from "react";
+import { useRouter } from "next/router";
 
 // Font files can be colocated inside of `pages`
 
@@ -95,20 +96,21 @@ type product = {
 };
 
 //------ SSR --------
-// export const getServerSideProps = (async (context) => {
-//   const productData = await loadProducts(); //called from lib folder. Server side rendering
-//   console.log(productData);
+export const getServerSideProps = (async () => {
+  const productData = await loadProducts(); 
+  // console.log(productData);
 
-//   return { props: { productData } };
-// }) satisfies GetServerSideProps<{ productData: product }>;
+  return { props: { productData } };
+}) satisfies GetServerSideProps<{ productData: product }>;
 
-// export default function Home({
-//   productData,
-// }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-export default function Home(productData = []) {
+export default function Home({
+  productData,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  // export default function Home(productData = []) {
+  const router = useRouter();
   return (
-    <>
-      <Container sx={{ padding: "60px 130px" }} maxWidth="xl">
+    <Stack spacing={2} alignItems={"center"}>
+      <Container maxWidth="xl" sx={{ paddingTop: "3rem" }}>
         <Box>
           <Stack direction={"row"} sx={{ alignItems: "center" }}>
             <Box flexGrow={1}>
@@ -127,24 +129,12 @@ export default function Home(productData = []) {
               <ImageButtonWithEndIcon
                 text="View more"
                 endIcon={<ChevronRightOutlinedIcon />}
+                onClick = {() => router.push("/products")}
               />
             </Box>
           </Stack>
           <Grid container spacing={2} marginTop={2.8}>
-            {petData.length > 0 &&
-              petData.slice(0, 13).map((item, index) => (
-                <Grid key={index} size={{ xs: 6, md: 4, lg: 3 }}>
-                  <PetCard
-                    id={index}
-                    title={item.name}
-                    image={item.img}
-                    price={item.price}
-                    category={item.gene}
-                    description={item.age}
-                  />
-                </Grid>
-              ))}
-            {/* {productData.length > 0 &&
+            {productData.length > 0 ?
               productData.slice(0, 13).map((item: product) => (
                 <Grid key={item.id} size={{ xs: 6, md: 4, lg: 3 }}>
                   <PetCard
@@ -157,7 +147,7 @@ export default function Home(productData = []) {
                     description={item.description}
                   />
                 </Grid>
-              ))} */}
+              )) : <Typography>Nothing to show</Typography>}
           </Grid>
           <Box sx={{ display: { xs: "block", md: "none" }, mt: "1rem" }}>
             <ImageButtonWithEndIcon
@@ -167,34 +157,44 @@ export default function Home(productData = []) {
           </Box>
         </Box>
       </Container>
-      <Container sx={{ padding: "60px 130px" }} maxWidth="xl">
-        <Box
+      <Container
+        maxWidth="xl"
+        sx={{ paddingTop: "3rem", paddingBottom: { xs: "3rem", md: "3rem" } }}
+      >
+        <Stack
+          direction={{ xs: "column", md: "row" }}
           sx={{
-            display: "flex",
-            flexDirection: {xs: "column", md: "row"},
-            justifyContent: "space-between",
+            rowGap: "1rem",
             borderRadius: "20px",
-            backgroundImage: ' url("/one_more_friend_bg.png")',
+            backgroundImage: {
+              xs: ' url("/one_more_friend_mobile_bg.png")',
+              md: ' url("/one_more_friend_bg.png")',
+            },
             backgroundRepeat: "no-repeat",
             backgroundSize: "cover",
           }}
         >
-          <Image
-            src={petWithHuman}
-            style={{ maxWidth: "100%" }}
-            alt="human_with_pet"
-          />
+          <Box
+            sx={{ order: { xs: 1, md: 0 }, width: { xs: "100%", md: "50%" } }}
+          >
+            <Image
+              src={petWithHuman}
+              alt="human_with_pet"
+              style={{ margin: "auto 0" }}
+            />
+          </Box>
 
           <Box
-            padding={"3.5rem 4.4rem 3rem 0rem"}
-            textAlign={"right"}
-            sx={{ maxWidth: "100%" }}
+            textAlign={{ xs: "center", md: "right" }}
+            sx={{
+              width: { xs: "100%", md: "50%" },
+              padding: { xs: ".5rem 1rem", md: "1rem 2rem 0 0" },
+            }}
           >
             <Stack spacing={0.2}>
               <Typography
                 sx={{
-                  fontSize: "42px",
-                  lineHeight: "68px",
+                  fontSize: { xs: "28px", md: "42px" },
                   fontWeight: "700",
                 }}
               >
@@ -202,8 +202,7 @@ export default function Home(productData = []) {
               </Typography>
               <Typography
                 sx={{
-                  fontSize: "28px",
-                  lineHeight: "60px",
+                  fontSize: { xs: "20px", md: "28px" },
                   fontWeight: "700",
                 }}
               >
@@ -214,8 +213,7 @@ export default function Home(productData = []) {
             <Typography
               sx={{
                 mt: "0.8rem",
-                fontSize: "14px",
-                lineHeight: "24px",
+                fontSize: { xs: "12px", md: "14px" },
                 fontWeight: "400",
               }}
             >
@@ -226,18 +224,20 @@ export default function Home(productData = []) {
 
             <Stack
               direction={"row"}
-              spacing={3}
-              sx={{ mt: "2rem", justifyContent: "end" }}
+              spacing={{ xs: 1, md: 3 }}
+              sx={{
+                mt: { xs: "1rem", md: "2rem" },
+                justifyContent: { xs: "center", md: "end" },
+              }}
             >
               <Button
                 variant={"outlined"}
                 sx={{
                   borderRadius: "57px",
-                  fontSize: "16px",
+                  fontSize: { xs: "10px", md: "16px" },
                   fontWeight: "bold",
                   textTransform: "none",
                   padding: "10px 29px",
-                  lineHeight: "24px",
                 }}
                 endIcon={<PlayCircleOutlineOutlinedIcon />}
               >
@@ -246,10 +246,10 @@ export default function Home(productData = []) {
               <PrimaryButton text="Explore Now" />
             </Stack>
           </Box>
-        </Box>
+        </Stack>
       </Container>
       <Container
-        sx={{ display: { xs: "none", md: "block" }, padding: "60px 130px" }}
+        sx={{ display: { xs: "none", md: "block" }, paddingTop: "3rem" }}
         maxWidth="xl"
       >
         <Stack
@@ -275,12 +275,12 @@ export default function Home(productData = []) {
             />
           </Box>
         </Stack>
+
         <Grid container spacing={2} marginTop={2.8}>
           {petData.length > 0 &&
             petData.map((pet, index) => (
-              <Grid size={{ xs: 6, md: 4, lg: 3 }}>
+              <Grid key={index} size={{ xs: 6, md: 4, lg: 3 }}>
                 <ProductCard
-                  key={index}
                   name={pet.name}
                   img={pet.img}
                   gene={pet.gene}
@@ -291,7 +291,10 @@ export default function Home(productData = []) {
             ))}
         </Grid>
       </Container>
-      <Container sx={{ display: { xs: "none", md: "block" }, padding: "60px 130px" }} maxWidth="xl">
+      <Container
+        sx={{ display: { xs: "none", md: "block" }, paddingTop: "3rem" }}
+        maxWidth="xl"
+      >
         <Stack direction={"row"}>
           <Box
             display="flex"
@@ -310,7 +313,7 @@ export default function Home(productData = []) {
             </Typography>
             <SectionTitle text="Pet Sellers" />
           </Box>
-          <Box sx={{ display: { xs: "none", md: "block" } }}>
+          <Box sx={{}}>
             <ImageButtonWithEndIcon
               text="View all our sellers"
               endIcon={<ChevronRightOutlinedIcon />}
@@ -319,29 +322,112 @@ export default function Home(productData = []) {
         </Stack>
         <ImageList cols={7} sx={{ marginTop: ".5rem" }}>
           <ImageListItem>
-            <img src="/sheba.png" alt="sheba" loading="lazy" />
+            <div
+              style={{
+                position: "relative",
+                aspectRatio: "1/1",
+                overflow: "hidden",
+              }}
+            >
+              <Image src={"/sheba.png"} alt="sheba image" fill sizes="264" />
+            </div>
           </ImageListItem>
           <ImageListItem>
-            <img src="/whiskas.png" alt="whiskas" loading="lazy" />
+            <div
+              style={{
+                position: "relative",
+                aspectRatio: "1/1",
+                overflow: "hidden",
+              }}
+            >
+              <Image
+                src={"/whiskas.png"}
+                alt="whiskas image"
+                fill
+                sizes="264"
+              />
+            </div>
           </ImageListItem>
           <ImageListItem>
-            <img src="/bakers.png" alt="bakers" loading="lazy" />
+            <div
+              style={{
+                position: "relative",
+                aspectRatio: "1/1",
+                overflow: "hidden",
+              }}
+            >
+              <Image src={"/bakers.png"} alt="bakers image" fill sizes="264" />
+            </div>
           </ImageListItem>
           <ImageListItem>
-            <img src="/felix.png" alt="felix" loading="lazy" />
+            <div
+              style={{
+                position: "relative",
+                aspectRatio: "1/1",
+                overflow: "hidden",
+              }}
+            >
+              <Image src={"/felix.png"} alt="felix image" fill sizes="264" />
+            </div>
           </ImageListItem>
           <ImageListItem>
-            <img src="/goodboy.png" alt="goodboy" loading="lazy" />
+            <div
+              style={{
+                position: "relative",
+                aspectRatio: "1/1",
+                overflow: "hidden",
+              }}
+            >
+              <Image
+                src={"/goodboy.png"}
+                alt="goodboy image"
+                fill
+                sizes="264"
+              />
+            </div>
           </ImageListItem>
           <ImageListItem>
-            <img src="/butchers.png" alt="butchers" loading="lazy" />
+            <div
+              style={{
+                position: "relative",
+                aspectRatio: "1/1",
+                overflow: "hidden",
+              }}
+            >
+              <Image
+                src={"/butchers.png"}
+                alt="butchers image"
+                fill
+                sizes="264"
+              />
+            </div>
           </ImageListItem>
           <ImageListItem>
-            <img src="/pedigree.png" alt="pedigree" loading="lazy" />
+            <div
+              style={{
+                position: "relative",
+                aspectRatio: "1/1",
+                overflow: "hidden",
+              }}
+            >
+              <Image
+                src={"/pedigree.png"}
+                alt="pedigree image"
+                fill
+                sizes="264"
+              />
+            </div>
           </ImageListItem>
         </ImageList>
       </Container>
-      <Container sx={{ display: { xs: "none", md: "block" }, padding: "60px 130px" }} maxWidth="xl">
+      <Container
+        sx={{
+          display: { xs: "none", md: "block" },
+          paddingTop: "3rem",
+          paddingBottom: { xs: "3rem", md: "3rem" },
+        }}
+        maxWidth="xl"
+      >
         <Stack
           sx={{
             justifyContent: "space-between",
@@ -411,6 +497,6 @@ export default function Home(productData = []) {
           />
         </Stack>
       </Container>
-    </>
+    </Stack>
   );
 }

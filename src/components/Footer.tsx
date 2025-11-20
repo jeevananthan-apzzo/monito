@@ -25,39 +25,43 @@ const Footer = () => {
           display: "flex",
           flexDirection: "column",
           gap: "2rem",
-          padding: "50px 130px 40px 130px",
+          // padding: {xs: "0 24px", md: "50px 0 40px 0"},
+          paddingTop: "50px",
+          paddingBottom: "40px",
         }}
       >
         <Stack
+          direction={{ xs: "column", md: "row" }}
           sx={{
-            flexDirection: { xs: "column", md: "row" },
             justifyContent: "space-between",
             alignItems: "center",
             borderRadius: "16px",
             padding: "32px",
             bgcolor: "#003459",
           }}
-          spacing={5}
+          spacing={{ xs: 2, md: 5 }}
         >
           <Typography
             sx={{
               maxWidth: { xs: "100%", md: "30%" },
-              fontSize: "24px",
+              fontSize: { xs: "15px", md: "24px" },
               fontWeight: "bold",
             }}
             variant="h6"
             color="#FDFDFD"
           >
-            Register Now So You Don't Miss Our Programs
+            Register Now So You Don&#39;t Miss Our Programs
           </Typography>
           <Stack
+            direction={{ xs: "column", md: "row" }}
             sx={{
-              flexDirection: { xs: "column", md: "row" },
+              width: { xs: "100%", md: "70%" },
               borderRadius: "16px",
               padding: "12px",
               bgcolor: "#fff",
+              alignItems: "center",
             }}
-            spacing={1}
+            spacing={1.5}
             flexGrow={1}
           >
             <TextField
@@ -65,17 +69,23 @@ const Footer = () => {
               placeholder="Enter your Email"
               variant="outlined"
               size="small"
-              sx={{ flexGrow: "1", borderRadius: "8px" }}
+              sx={{
+                width: { xs: "100%", md: "20%" },
+                fontSize: { xs: "13px" },
+                flexGrow: "1",
+                borderRadius: "8px",
+              }}
             />
             <Button
               variant="contained"
               sx={{
+                width: { xs: "100%", md: "20%" },
                 borderRadius: "8px",
-                fontSize: "16px",
+                fontSize: { xs: "13px", md: "17px" },
                 fontWeight: "400",
                 textTransform: "none",
-                paddingRight: "28px",
-                paddingLeft: "28px",
+                paddingRight: "20px",
+                paddingLeft: "20px",
               }}
               size="small"
             >
@@ -83,14 +93,17 @@ const Footer = () => {
             </Button>
           </Stack>
         </Stack>
-        <Stack direction={"row"} sx={{ justifyContent: "space-between" }}>
-          <Stack direction="row" spacing={3}>
+        <Stack
+          direction={{ xs: "column", md: "row" }}
+          sx={{ justifyContent: "space-between", alignItems: { xs: "center" } }}
+        >
+          <Stack direction="row">
             {navItems.map((item) => (
               <Button
                 variant="text"
                 key={item}
                 sx={{
-                  fontSize: "16px",
+                  fontSize: { xs: "12px", md: "16px" },
                   fontWeight: "bold",
                   color: "#002a48",
                   textTransform: "none",
@@ -101,34 +114,58 @@ const Footer = () => {
             ))}
           </Stack>
 
-          <Stack direction={"row"} spacing={1}>
+          <Stack direction={"row"} spacing={{xs: 2, md: 3}}>
             <IconButton aria-label="face book" href="#fb">
-              <img src="/fb_icon.svg" alt="facebook" loading="lazy" />
+              <Image fill src="/fb_icon.svg" alt="facebook" loading="lazy" />
             </IconButton>
             <IconButton aria-label="twitter">
-              <img src="/tw_icon.svg" alt="twitter" loading="lazy" />
+              <Image fill src="/tw_icon.svg" alt="twitter" loading="lazy" />
             </IconButton>
             <IconButton aria-label="instagram">
-              <img src="/insta_icon.svg" alt="instagram" loading="lazy" />
+              <Image
+                fill
+                src="/insta_icon.svg"
+                alt="instagram"
+                loading="lazy"
+              />
             </IconButton>
             <IconButton aria-label="youtube">
-              <img src="/yt_icon.svg" alt="youtube" loading="lazy" />
+              <Image fill src="/yt_icon.svg" alt="youtube" loading="lazy" />
             </IconButton>
           </Stack>
         </Stack>
         <Divider />
-        <Stack direction={"row"} sx={{ justifyContent: "space-between" }}>
+        <Stack
+          direction={{ xs: "column", md: "row" }}
+          spacing={{ xs: 0, md: 3 }}
+          sx={{
+            rowGap: { xs: "1rem", md: 0 },
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
           <Typography
             sx={{
-              fontSize: "14px",
+              order: 2,
+              fontSize: { xs: "12px", md: "14px" },
               fontWeight: "400",
               color: "#667479",
             }}
           >
             © 2025 Monito. All rights reserved.
           </Typography>
-          <Image src={monitoLogo} alt="monito logo" width={115} height={40} />
-          <Stack direction={"row"} spacing={2}>
+          <Image
+            src={monitoLogo}
+            alt="monito logo"
+            width={115}
+            height={40}
+            style={{ order: 1 }}
+          />
+          <Stack
+            direction={"row"}
+            spacing={2}
+            sx={{ fontSize: { xs: "12px", md: "14px" }, order: 0 }}
+          >
             <Link href="#terms" underline="hover">
               Terms of Service
             </Link>

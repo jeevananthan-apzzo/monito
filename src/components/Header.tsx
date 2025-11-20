@@ -19,10 +19,13 @@ import { Grid, Stack } from "@mui/material";
 import { monitoFont } from "./Layout";
 import HomeBannerContent from "./HomeBannerContent";
 import PrimaryButton from "@/custom components/PrimaryButton";
+import { useRouter } from "next/router";
 
 export const navItems = ["Home", "Category", "About", "Contact"];
 
 const Header = () => {
+
+  const router = useRouter();
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
   );
@@ -35,8 +38,11 @@ const Header = () => {
     setAnchorElNav(null);
   };
 
+  const headerClass = router.pathname !== "/products" ? "monito-header" : "";
+  
+
   return (
-    <header className="monito-header">
+    <header className={headerClass}>
       <AppBar
         position="static"
         component="nav"
@@ -136,40 +142,41 @@ const Header = () => {
                 aria-controls="cart-appbar"
                 aria-haspopup="true"
               >
-                <img src="/cart_icon.svg" alt="add to cart" />
+                <Image  src="/cart_icon.svg" alt="add to cart" width={24} height={24}/>
               </IconButton>
             </Box>
           </Toolbar>
         </Container>
       </AppBar>
-      <Container maxWidth="xl" sx={{ display: {xs: "none", md: "block"},height: "100%", position: "relative" }}>
-        {/* <Grid container direction="row">
-          <Grid size={6}>
-            <HomeBannerContent />
-          </Grid>
-          <Grid size={6}>
-            <Image
-              src={humanWithPet}
-              width={900}
-              height={600}
-              alt="human_with_pet"
-            /> 
-          </Grid>
-        </Grid> */}
+      <Container
+        maxWidth="xl"
+        sx={{
+          display: (headerClass === "") ? "none" : "block",
+          height: "100%",
+          position: "relative",
+        }}
+      >
         <HomeBannerContent />
-        <img
-          src="/home_banner_img.png"
-          alt="pet with human"
-          loading="lazy"
+        <div
           style={{
-            // width: "60%",
-            // height: "90%",
-            maxWidth: "60%",
+            maxWidth: "100%",
+            maxHeight: "100%",
             position: "absolute",
             bottom: "0",
             right: "0",
+            aspectRatio: "1/1",
+            borderRadius: "12px",
+            overflow: "hidden",
           }}
-        />
+        >
+          <Image
+            src="/home_banner_img.png"
+            alt="pet with human"
+            width={690}
+            height={940}
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
+        </div>
       </Container>
     </header>
   );

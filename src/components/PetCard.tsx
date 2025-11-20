@@ -1,5 +1,6 @@
 import { Card, CardMedia, Stack, Typography } from "@mui/material";
-import React from "react";
+import Image from "next/image";
+import React, { useEffect, useState } from "react";
 
 interface PetType {
   name: string;
@@ -18,7 +19,15 @@ type product = {
   image: URL | string;
 };
 
-const PetCard = ({ id, title, price, description, category, image }: product) => {
+const PetCard = ({
+  id,
+  title,
+  price,
+  description,
+  category,
+  image,
+}: product) => {
+
   return (
     <Card
       sx={{
@@ -27,14 +36,24 @@ const PetCard = ({ id, title, price, description, category, image }: product) =>
         padding: "10px",
       }}
     >
-      <CardMedia
-        component="img"
-        alt="pet_image"
-        height="264"
-        width="264"
-        image={image.toString()}
-        sx={{ borderRadius: "12px" }}
-      />
+      <div
+        style={{
+          position: "relative",
+          width: "100%",
+          aspectRatio: "1/1",
+          borderRadius: "12px",
+          overflow: "hidden",
+        }}
+      >
+        <Image
+          src={image.toString()}
+          alt="pet image"
+          fill
+          sizes="264"
+          // style={{ objectFit: "cover" }}
+        />
+      </div>
+
       <Stack
         spacing={0.5}
         sx={{
@@ -46,9 +65,15 @@ const PetCard = ({ id, title, price, description, category, image }: product) =>
             fontWeight: "bold",
             fontSize: "16px",
             lineHeight: "24px",
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            minHeight: "48px",
           }}
         >
-          {(title.length > 30) ? `${title.slice(0,30)}...` : title }
+          {title}
         </Typography>
         <Typography
           sx={{
@@ -68,7 +93,7 @@ const PetCard = ({ id, title, price, description, category, image }: product) =>
             lineHeight: "20px",
           }}
         >
-          {`₹${price}`}
+          {`₹${price}.00`}
         </Typography>
       </Stack>
     </Card>
