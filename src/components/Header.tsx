@@ -38,7 +38,7 @@ const Header = () => {
     setAnchorElNav(null);
   };
 
-  const headerClass = router.pathname !== "/products" ? "monito-header" : "";
+  const headerClass = router.pathname === "/" ? "monito-header" : "";
   
 
   return (

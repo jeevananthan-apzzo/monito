@@ -53,10 +53,14 @@ body {
   border-top-right-radius: 40px;
 }
 
+.title-price {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
 @media (max-width: 768px) {
   .monito-header {
     background-image: url("/home_banner_mobile_bg.png");
   }
 }
-
-
