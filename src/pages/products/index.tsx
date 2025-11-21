@@ -5,15 +5,24 @@ import {
   Checkbox,
   Container,
   Divider,
+  FilledInput,
+  FormControl,
   FormControlLabel,
   FormGroup,
   Grid,
+  IconButton,
+  InputAdornment,
   Link,
+  MenuItem,
   Pagination,
+  PaginationItem,
+  Select,
+  SelectChangeEvent,
   Stack,
+  TextField,
   Typography,
 } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import allDogs from "../../../public/all_products_banner_dogs_1.png";
 import Image from "next/image";
 import PrimaryButton from "@/custom components/PrimaryButton";
@@ -21,18 +30,93 @@ import PlayCircleOutlineOutlinedIcon from "@mui/icons-material/PlayCircleOutline
 import SectionTitle from "@/custom components/SectionTitle";
 import { styled } from "@mui/material/styles";
 import ImageButtonWithEndIcon from "@/custom components/ImageButtonWithEndIcon";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { InferGetServerSidePropsType } from "next";
+import { getServerSideProps, product } from "..";
+import PetCard from "@/components/PetCard";
+import { getProductServerSideProps, ProductProps } from "@/lib/fetchProducts";
 
-const CustomCheckbox = styled(Checkbox)(({ theme }) => ({
-  "& .MuiSvgIcon-root": {
-    borderRadius: "4px",
-    border: "1px solid #CCD1D2",
-    // width: 20,
-    // height: 20,
-  },
-}));
+export { getProductServerSideProps as getServerSideProps };
 
-const index = () => {
+const index = ({ productData }: ProductProps) => {
+  const [filteredData, setFilteredData] = useState<product[]>([]);
+  const colors = [
+    { label: "Green", value: "green", hex: "#4caf50" },
+    { label: "Red", value: "red", hex: "#f44336" },
+    { label: "Blue", value: "blue", hex: "#2196f3" },
+  ];
+
+  const sortables: Record<number, string> = {
+    10: "Popularity",
+    20: "A-Z Order",
+    30: "Price low - high",
+  };
+
+  const [sortBy, setSortby] = useState<number>(1);
+  const [minPrice, setMinPrice] = useState<number | null>(null);
+  const [maxPrice, setMaxPrice] = useState<number | null>(null);
+
+  const PrevIcon = () => (
+    <img src={"/left_pg.svg"} alt="prev" style={{ width: 12, height: 12 }} />
+  );
+
+  const NextIcon = () => (
+    <img src={"/right_pg.svg"} alt="next" style={{ width: 12, height: 12 }} />
+  );
+
+  const handleIncrement = (
+    setPrice: React.Dispatch<React.SetStateAction<number | null>>
+  ) => {
+    setPrice((prev: number | null) => {
+      return prev === null ? 100 : prev + 100;
+    });
+  };
+
+  const handleDecrement = (
+    setPrice: React.Dispatch<React.SetStateAction<number | null>>
+  ) => {
+    setPrice((prev: number | null) => {
+      return prev === null ? 0 : prev - 100;
+    });
+  };
+
+  const [page, setPage] = React.useState(1);
+  const handlePageChange = (
+    event: React.ChangeEvent<unknown>,
+    value: number
+  ) => {
+    setPage(value);
+  };
+
+  const [category, setCategory] = useState<string[]>([]);
+
+  const handleCategoryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, checked } = event.target;
+
+    setCategory((prev) =>
+      checked ? [...prev, value] : prev.filter((item) => item !== value)
+    );
+  };
+
+  //when filtering
+  useEffect(() => {
+    const tempFiltered = productData.filter((p) => {
+      const price = Number(p.price);
+
+      const inCategory =
+        category.length > 0 ? category.includes(p.category) : true;
+
+      const inPriceRange =
+        price >= (minPrice ?? 0) && price <= (maxPrice ?? Infinity);
+
+      return inCategory && inPriceRange;
+    });
+
+    setFilteredData(tempFiltered);
+  }, [category, minPrice, maxPrice]);
+
   return (
     <Container maxWidth="xl">
       <div role="presentation">
@@ -150,8 +234,8 @@ const index = () => {
           </Stack>
         </Box>
       </Box>
-      <Grid container mt={"1rem"}>
-        <Grid size={3}>
+      <Grid container m={"1rem 0"} columnSpacing={3}>
+        <Grid size={4} sx={{display: {xs: "none", md: "grid"}}}>
           <Stack spacing={2}>
             <SectionTitle text="Filter" />
             <div>
@@ -165,12 +249,40 @@ const index = () => {
                 Category
               </Typography>
               <FormGroup>
-                <FormControlLabel control={<Checkbox />} label="Jewelry" />
                 <FormControlLabel
-                  control={<Checkbox defaultChecked />}
+                  value={"men's clothing"}
+                  control={
+                    <Checkbox onChange={handleCategoryChange} />
+                  }
                   label="Men's Clothing"
                 />
-                <FormControlLabel control={<Checkbox />} label="Electronics" />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      value={"women's clothing"}
+                      onChange={handleCategoryChange}
+                    />
+                  }
+                  label="Women's Clothing"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      value={"jewelery"}
+                      onChange={handleCategoryChange}
+                    />
+                  }
+                  label="Jewelry"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      value={"electronics"}
+                      onChange={handleCategoryChange}
+                    />
+                  }
+                  label="Electronics"
+                />
               </FormGroup>
             </div>
             <Divider />
@@ -186,15 +298,135 @@ const index = () => {
                 Color
               </Typography>
               <FormGroup>
-                <FormControlLabel control={<Checkbox />} label="Red" />
-                <FormControlLabel
-                  control={<Checkbox defaultChecked />}
-                  label="Green"
-                />
-                <FormControlLabel control={<Checkbox />} label="Blue" />
+                {colors.map((color) => (
+                  <FormControlLabel
+                    key={color.value}
+                    control={<Checkbox />}
+                    label={
+                      <Box display="flex" alignItems="center" gap={1}>
+                        <Box
+                          width={16}
+                          height={16}
+                          borderRadius="50%"
+                          bgcolor={color.hex}
+                        />
+                        {color.label}
+                      </Box>
+                    }
+                  />
+                ))}
               </FormGroup>
             </div>
             <Divider />
+
+            <div>
+              <Typography
+                sx={{
+                  color: "#000",
+                  fontSize: "16px",
+                  fontWeight: "bold",
+                }}
+              >
+                Price
+              </Typography>
+              <Stack direction={"row"} spacing={"1"}>
+                <FormControl variant="filled">
+                  <TextField
+                    value={minPrice}
+                    placeholder="Min"
+                    id="min-price"
+                    sx={{
+                      "& .MuiOutlinedInput-notchedOutline": {
+                        border: "none",
+                        borderBottom: "1px solid #EBEEEF",
+                      },
+                    }}
+                    size="small"
+                    disabled
+                    slotProps={{
+                      input: {
+                        readOnly: true,
+                        endAdornment: (
+                          <InputAdornment
+                            sx={{
+                              padding: ".3rem 0",
+                              display: "flex",
+                              flexDirection: "column",
+                              justifyContent: "center",
+                            }}
+                            position="end"
+                          >
+                            <IconButton
+                              size="small"
+                              onClick={() => handleIncrement(setMinPrice)}
+                            >
+                              <KeyboardArrowUpIcon fontSize="small" />
+                            </IconButton>
+                            <IconButton
+                              size="small"
+                              onClick={() => handleDecrement(setMinPrice)}
+                              disabled={!minPrice || minPrice <= 0}
+                            >
+                              <KeyboardArrowDownIcon fontSize="small" />
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      },
+                    }}
+                    aria-describedby="min-price-input"
+                    inputProps={{
+                      "aria-label": "min-price",
+                    }}
+                  />
+                </FormControl>
+                <FormControl variant="filled">
+                  <TextField
+                    value={maxPrice}
+                    id="max-price"
+                    placeholder="Max"
+                    sx={{
+                      "& .MuiOutlinedInput-notchedOutline": {
+                        border: "none",
+                        borderBottom: "1px solid #EBEEEF",
+                      },
+                    }}
+                    size="small"
+                    slotProps={{
+                      input: {
+                        readOnly: true,
+                        endAdornment: (
+                          <InputAdornment
+                            sx={{
+                              padding: ".3rem 0",
+                              display: "flex",
+                              flexDirection: "column",
+                              justifyContent: "center",
+                            }}
+                            position="end"
+                          >
+                            <IconButton
+                              size="small"
+                              onClick={() => handleIncrement(setMaxPrice)}
+                            >
+                              <KeyboardArrowUpIcon fontSize="small" />
+                            </IconButton>
+                            <IconButton
+                              size="small"
+                              disabled={!maxPrice || maxPrice <= 0}
+                              onClick={() => handleDecrement(setMaxPrice)}
+                            >
+                              <KeyboardArrowDownIcon fontSize="small" />
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      },
+                    }}
+                    aria-describedby="max-price-input"
+                  />
+                </FormControl>
+              </Stack>
+            </div>
+
             <div>
               <Typography
                 sx={{
@@ -216,21 +448,98 @@ const index = () => {
             </div>
           </Stack>
         </Grid>
-        <Grid size={9}>
+        <Grid
+          size={{xs: 12, md:8}}
+          sx={{ display: "flex", flexDirection: "column", rowGap: "1rem" }}
+        >
           <Stack direction={"row"} sx={{ alignItems: "center" }}>
             <Box flexGrow={1}>
               <SectionTitle text="All Products" />
             </Box>
             <Box sx={{ display: { xs: "none", md: "block" } }}>
-              <ImageButtonWithEndIcon
-                text="Sort by: Popular"
-                endIcon={<ExpandMoreIcon />}
-              />
+              <Select
+                value={sortables[sortBy]} // show empty string if null
+                onChange={(e) => setSortby(Number(e.target.value))}
+                displayEmpty
+                inputProps={{ "aria-label": "sort by " }}
+                IconComponent={ExpandMoreIcon}
+                size="small"
+                renderValue={(selected) => {
+                  if (!selected) return <span>Sort by: Popularity</span>;
+                  return `Sort by: ${sortables[Number(selected)]}`;
+                }}
+                sx={{
+                  // width: "166px",
+                  borderRadius: "57px",
+                  fontSize: { xs: "10px", md: "14px" },
+                  fontWeight: "500",
+                  textTransform: "none",
+                  padding: "6px 20px",
+                }}
+              >
+                <MenuItem value={1} selected>
+                  Popularity
+                </MenuItem>
+                <MenuItem value={2}>A-Z Order</MenuItem>
+                <MenuItem value={3}>Price low - high</MenuItem>
+              </Select>
             </Box>
           </Stack>
-          <Box flexGrow={1}></Box>
-          <Box textAlign={"center"}>
-            <Pagination count={10} shape="rounded" />
+          <Grid flexGrow={1} container spacing={2}>
+            {productData.length > 0 ? (
+              filteredData.length > 0 ? (
+                filteredData
+                  .slice(page * 15 - 15, page * 15)
+                  .map((item: product) => (
+                    <Grid key={item.id} size={{ xs: 6, md: 4 }}>
+                      <PetCard
+                        key={item.id}
+                        id={item.id}
+                        title={item.title}
+                        image={item.image}
+                        price={item.price}
+                        category={item.category}
+                        description={item.description}
+                      />
+                    </Grid>
+                  ))
+              ) : (
+                <Typography>
+                  Nothing to show, Try with different filtering method
+                </Typography>
+              )
+            ) : (
+              <Typography>Nothing to show</Typography>
+            )}
+          </Grid>
+          <Box>
+            <Pagination
+              count={Math.ceil(filteredData.length / 15)}
+              page={page}
+              onChange={handlePageChange}
+              shape="rounded"
+              renderItem={(item) => (
+                <PaginationItem
+                  {...item}
+                  slots={{
+                    previous: PrevIcon,
+                    next: NextIcon,
+                  }}
+                />
+              )}
+              sx={{
+                "& .MuiPaginationItem-root": {
+                  fontSize: "16px",
+                  fontWeight: "bold",
+                  borderRadius: "8px",
+                },
+                "& .Mui-selected": {
+                  color: "#fdfdfd",
+                  bgcolor: "#002a48 !important",
+                },
+                "& .MuiPagination-ul": { justifyContent: "center" },
+              }}
+            />
           </Box>
         </Grid>
       </Grid>

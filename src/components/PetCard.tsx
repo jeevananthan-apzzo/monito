@@ -50,7 +50,7 @@ const PetCard = ({
           alt="pet image"
           fill
           sizes="264"
-          // style={{ objectFit: "cover" }}
+          style={{ padding: "14px" }}
         />
       </div>
 
@@ -93,7 +93,7 @@ const PetCard = ({
             lineHeight: "20px",
           }}
         >
-          {`₹${price}.00`}
+          {`₹${price}`}
         </Typography>
       </Stack>
     </Card>

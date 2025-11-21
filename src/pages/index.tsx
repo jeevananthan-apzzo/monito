@@ -24,6 +24,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { loadProducts } from "@/lib/load_products";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
+import { getProductServerSideProps, ProductProps } from "@/lib/fetchProducts";
 
 // Font files can be colocated inside of `pages`
 
@@ -86,7 +87,7 @@ const petData = [
   },
 ];
 
-type product = {
+export type product = {
   id: number;
   title: string;
   price: number;
@@ -95,17 +96,10 @@ type product = {
   image: URL | string;
 };
 
-//------ SSR --------
-export const getServerSideProps = (async () => {
-  const productData = await loadProducts(); 
-  // console.log(productData);
-
-  return { props: { productData } };
-}) satisfies GetServerSideProps<{ productData: product }>;
-
+export {getProductServerSideProps as getServerSideProps};
 export default function Home({
   productData,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  }: ProductProps) {
   // export default function Home(productData = []) {
   const router = useRouter();
   return (
