@@ -1,5 +1,6 @@
 import { Card, CardMedia, Stack, Typography } from "@mui/material";
 import Image from "next/image";
+import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 
 interface PetType {
@@ -28,13 +29,18 @@ const PetCard = ({
   image,
 }: product) => {
 
+  const router = useRouter();
+  
   return (
     <Card
+    onClick = {() => router.push(`/products/${id}`)}
       sx={{
         boxShadow: " 0px 4px 28px -2px #00000014",
         borderRadius: "12px",
         padding: "10px",
+        cursor: "pointer"
       }}
+      
     >
       <div
         style={{
@@ -70,7 +76,7 @@ const PetCard = ({
             WebkitBoxOrient: "vertical",
             overflow: "hidden",
             textOverflow: "ellipsis",
-            minHeight: "48px",
+            minHeight: {xs: "24px", md: "48px"},
           }}
         >
           {title}

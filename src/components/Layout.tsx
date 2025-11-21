@@ -46,6 +46,9 @@ const monitoTheme = createTheme({
     secondary: {
       main: "#FCEED5",
     },
+    warning: {
+      main: '#D6920F'
+    }
   },
 });
 

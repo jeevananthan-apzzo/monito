@@ -13,7 +13,6 @@ import {
 } from "@mui/material";
 import React from "react";
 import monitoLogo from "../../public/logo.svg";
-import { navItems } from "./Header";
 import Image from "next/image";
 
 const Footer = () => {
@@ -98,23 +97,61 @@ const Footer = () => {
           sx={{ justifyContent: "space-between", alignItems: { xs: "center" } }}
         >
           <Stack direction="row">
-            {navItems.map((item) => (
-              <Button
-                variant="text"
-                key={item}
-                sx={{
-                  fontSize: { xs: "12px", md: "16px" },
-                  fontWeight: "bold",
-                  color: "#002a48",
-                  textTransform: "none",
-                }}
-              >
-                {item}
-              </Button>
-            ))}
+            <Button
+              variant="text"
+              sx={{
+                fontSize: { xs: "12px", md: "16px" },
+                fontWeight: "bold",
+                color: "#002a48",
+                textTransform: "none",
+              }}
+              href="/"
+              // onClick={() => router.push(page.url)}
+            >
+              Home
+            </Button>
+            <Button
+              variant="text"
+              sx={{
+                fontSize: { xs: "12px", md: "16px" },
+                fontWeight: "bold",
+                color: "#002a48",
+                textTransform: "none",
+              }}
+              href="/category"
+              // onClick={() => router.push(page.url)}
+            >
+              Category
+            </Button>
+            <Button
+              variant="text"
+              sx={{
+                fontSize: { xs: "12px", md: "16px" },
+                fontWeight: "bold",
+                color: "#002a48",
+                textTransform: "none",
+              }}
+              href="/about"
+              // onClick={() => router.push(page.url)}
+            >
+              About
+            </Button>
+            <Button
+              variant="text"
+              sx={{
+                fontSize: { xs: "12px", md: "16px" },
+                fontWeight: "bold",
+                color: "#002a48",
+                textTransform: "none",
+              }}
+              href="/contact"
+              // onClick={() => router.push(page.url)}
+            >
+              Contact
+            </Button>
           </Stack>
 
-          <Stack direction={"row"} spacing={{xs: 2, md: 3}}>
+          <Stack direction={"row"} spacing={{ xs: 2, md: 3 }}>
             <IconButton aria-label="face book" href="#fb">
               <Image fill src="/fb_icon.svg" alt="facebook" loading="lazy" />
             </IconButton>

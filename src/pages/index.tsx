@@ -147,6 +147,7 @@ export default function Home({
             <ImageButtonWithEndIcon
               text="View more"
               endIcon={<ChevronRightOutlinedIcon />}
+              onClick={() => router.push("/products")}
             />
           </Box>
         </Box>
