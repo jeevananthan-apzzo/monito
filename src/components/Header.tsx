@@ -11,33 +11,34 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import monitoLogo from "../../public/logo.svg";
 import humanWithPet from "../../public/home_banner_img.png";
 import {
+  Divider,
   FormControl,
   FormControlLabel,
   Grid,
   InputAdornment,
   InputLabel,
   Link,
+  ListItemIcon,
   Modal,
   OutlinedInput,
   Stack,
 } from "@mui/material";
+import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
 import { monitoFont } from "./Layout";
 import HomeBannerContent from "./HomeBannerContent";
 import PrimaryButton from "@/custom components/PrimaryButton";
 import { useRouter } from "next/router";
 import { useMediaQuery, useTheme } from "@mui/material";
-import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
-import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import Visibility from "@mui/icons-material/RemoveRedEyeOutlined";
-import VisibilityOff from "@mui/icons-material/VisibilityOffOutlined";
-import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
+import Logout from "@mui/icons-material/LogoutOutlined";
+import LoginUser from "./LoginUser";
+import RegisterUser from "./RegisterUser";
+import OtpVerify from "./OtpVerify";
 
 const Header = () => {
   const router = useRouter();
@@ -49,19 +50,31 @@ const Header = () => {
     setAnchorElNav(event.currentTarget);
   };
 
+  const [isLoggedIn, setLoggedIn] = useState(false);
+  const [userDetails, setUserDetails] = useState<
+    "" | { username: ""; token: "" }
+  >("");
+  console.log(isLoggedIn);
+
+  const [loading, setLoading] = useState(false);
   const [open, setOpen] = React.useState(false);
   const handleOpenLogin = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   const handleCloseNavMenu = (url: string = "") => {
     setAnchorElNav(null);
-    // if(url !== "") router.push(url);
   };
 
-  const [authState, setAuthState] = useState("email_verify");
-  const [showPassword, setShowPassword] = React.useState(false);
+  const [authState, setAuthState] = useState("login");
 
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const [anchorProfile, setAnchorProfile] = useState<null | HTMLElement>(null);
+  const openProfileMenu = Boolean(anchorProfile);
+  const handleClickProfileMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorProfile(event.currentTarget);
+  };
+  const handleProfileClose = () => {
+    setAnchorProfile(null);
+  };
 
   const handleMouseDownPassword = (
     event: React.MouseEvent<HTMLButtonElement>
@@ -75,31 +88,6 @@ const Header = () => {
     event.preventDefault();
   };
 
-  const [otp, setOtp] = useState(["", "", "", ""]);
-  const inputsRef = useRef<HTMLInputElement[]>([]);
-
-  const handleChange = (index: number, value: string) => {
-    if (!/^\d*$/.test(value)) return; // only digits allowed
-
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
-
-    // Move focus to next input
-    if (value && index < 3) {
-      inputsRef.current[index + 1]?.focus();
-    }
-  };
-
-  const handleBackspace = (
-    index: number,
-    e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    if (e.key === "Backspace" && !otp[index] && index > 0) {
-      inputsRef.current[index - 1]?.focus();
-    }
-  };
-
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
@@ -109,6 +97,21 @@ const Header = () => {
   } else if (router.pathname === "/products/[product_id]" && isMobile) {
     headerClass = "d-none";
   }
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    setLoggedIn(!!user.token);
+    if (user) setUserDetails(user);
+  }, [loading]);
+
+  const handleLogout = () => {
+    localStorage.clear();
+    router.push("/");
+    router.reload();
+  };
+
+  const capitalizeFirst = (str: string): string =>
+    str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
 
   return (
     <header className={headerClass}>
@@ -193,7 +196,254 @@ const Header = () => {
                     Contact
                   </Button>
                 </Stack>
-                <PrimaryButton text="Login" onClick={handleOpenLogin} />
+                <Box>
+                  {isLoggedIn ? (
+                    <>
+                      <Button
+                        onClick={handleClickProfileMenu}
+                        size="small"
+                        sx={{ textTransform: "none" }}
+                        aria-controls={
+                          openProfileMenu ? "account-menu" : undefined
+                        }
+                        aria-haspopup="true"
+                        aria-expanded={openProfileMenu ? "true" : undefined}
+                        startIcon={
+                          <Avatar
+                            src="/person_filled.svg"
+                            sx={{ width: 32, height: 32 }}
+                          />
+                        }
+                        endIcon={
+                          <ExpandMoreRoundedIcon
+                            style={{
+                              rotate: openProfileMenu ? "180deg" : "0deg",
+                            }}
+                          />
+                        }
+                      >
+                        {userDetails && capitalizeFirst(userDetails.username)}
+                      </Button>
+                      <Button
+                        size="large"
+                        aria-label="add to cart"
+                        aria-controls="cart-appbar"
+                        aria-haspopup="true"
+                        sx={{ textTransform: "none" }}
+                        startIcon={
+                          <Image
+                            src="/cart_icon.svg"
+                            alt="add to cart"
+                            width={24}
+                            height={24}
+                          />
+                        }
+                      >
+                        Cart
+                      </Button>
+                      <Menu
+                        anchorEl={anchorProfile}
+                        id="profile-menu"
+                        open={openProfileMenu}
+                        onClose={handleProfileClose}
+                        onClick={handleProfileClose}
+                        keepMounted
+                        slotProps={{
+                          paper: {
+                            elevation: 0,
+                            sx: {
+                              overflow: "visible",
+                              filter:
+                                "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                              mt: 1.5,
+                              "& .MuiAvatar-root": {
+                                width: 32,
+                                height: 32,
+                                ml: -0.5,
+                                mr: 1,
+                              },
+                              "&::before": {
+                                content: '""',
+                                display: "block",
+                                position: "absolute",
+                                top: 0,
+                                right: 14,
+                                width: 10,
+                                height: 10,
+                                bgcolor: "background.paper",
+                                transform: "translateY(-50%) rotate(45deg)",
+                                zIndex: 0,
+                              },
+                            },
+                          },
+                        }}
+                        transformOrigin={{
+                          horizontal: "right",
+                          vertical: "top",
+                        }}
+                        anchorOrigin={{
+                          horizontal: "right",
+                          vertical: "bottom",
+                        }}
+                      >
+                        <MenuItem
+                          onClick={handleProfileClose}
+                          sx={{ fontWeight: "bold" }}
+                        >
+                          Hello User
+                        </MenuItem>
+                        <Divider />
+
+                        <MenuItem onClick={() => router.push("/myprofile")}>
+                          <Avatar
+                            sx={{
+                              width: "16px",
+                              height: "16px",
+                              bgcolor: "transparent",
+                            }}
+                          >
+                            <img
+                              src="/person_outlined.svg"
+                              alt="person_outlined"
+                              style={{
+                                width: "16px",
+                                height: "16px",
+                                objectFit: "contain", // or "cover"
+                              }}
+                            />
+                          </Avatar>{" "}
+                          My Profile
+                        </MenuItem>
+                        <Divider
+                          variant="middle"
+                          component="li"
+                          sx={{ marginTop: "0" }}
+                        />
+                        <MenuItem onClick={() => router.push("/myorders")}>
+                          <Avatar
+                            sx={{
+                              width: "16px",
+                              height: "16px",
+                              bgcolor: "transparent",
+                            }}
+                          >
+                            <img
+                              src="/shop_bag.svg"
+                              alt="shop"
+                              style={{
+                                width: "16px",
+                                height: "16px",
+                                objectFit: "contain", // or "cover"
+                              }}
+                            />
+                          </Avatar>{" "}
+                          My Orders
+                        </MenuItem>
+                        <Divider
+                          variant="middle"
+                          component="li"
+                          sx={{ marginTop: "0" }}
+                        />
+
+                        <MenuItem onClick={() => router.push("/wishlist")}>
+                          <Avatar
+                            sx={{
+                              width: "16px",
+                              height: "16px",
+                              bgcolor: "transparent",
+                            }}
+                          >
+                            <img
+                              src="/wishlist.svg"
+                              alt="wishlist"
+                              style={{
+                                width: "16px",
+                                height: "16px",
+                                objectFit: "contain", // or "cover"
+                              }}
+                            />
+                          </Avatar>
+                          Wishlist
+                        </MenuItem>
+                        <Divider
+                          variant="middle"
+                          component="li"
+                          sx={{ marginTop: "0" }}
+                        />
+
+                        <MenuItem onClick={() => router.push("/addresses")}>
+                          <Avatar
+                            sx={{
+                              width: "16px",
+                              height: "16px",
+                              bgcolor: "transparent",
+                            }}
+                          >
+                            <img
+                              src="/location_pin.svg"
+                              alt="location_pin"
+                              style={{
+                                width: "16px",
+                                height: "16px",
+                                objectFit: "contain", // or "cover"
+                              }}
+                            />
+                          </Avatar>
+                          Saved Addresses
+                        </MenuItem>
+                        <Divider
+                          variant="middle"
+                          component="li"
+                          sx={{ marginTop: "0" }}
+                        />
+
+                        <MenuItem onClick={() => router.push("/notifications")}>
+                          <Avatar
+                            sx={{
+                              width: "16px",
+                              height: "16px",
+                              bgcolor: "transparent",
+                            }}
+                          >
+                            <img
+                              src="/notify_bell.svg"
+                              alt="notify_bell"
+                              style={{
+                                width: "16px",
+                                height: "16px",
+                                objectFit: "contain", // or "cover"
+                              }}
+                            />
+                          </Avatar>
+                          Notifications
+                        </MenuItem>
+                        <Divider
+                          variant="middle"
+                          component="li"
+                          sx={{ marginTop: "0" }}
+                        />
+
+                        <MenuItem
+                          onClick={handleLogout}
+                          sx={{ color: "#EB001B" }}
+                        >
+                          <ListItemIcon
+                            sx={{
+                              color: "#EB001B",
+                              width: "16px",
+                              height: "16px",
+                            }}
+                          >
+                            <Logout fontSize="small" />
+                          </ListItemIcon>
+                          Logout
+                        </MenuItem>
+                      </Menu>
+                    </>
+                  ) : (
+                    <PrimaryButton text="Login" onClick={handleOpenLogin} />
+                  )}
+                </Box>
               </Box>
             </Stack>
             <Box
@@ -232,30 +482,60 @@ const Header = () => {
                 onClick={() => handleCloseNavMenu()}
                 sx={{ display: { xs: "block", md: "none" } }}
               >
-                <MenuItem
-                  href="/"
-                  // onClick={() => handleCloseNavMenu(page.url)}
-                >
+                <MenuItem href="/">
                   <Typography sx={{ textAlign: "center" }}>Home</Typography>
                 </MenuItem>
-                <MenuItem
-                  href="/category"
-                  // onClick={() => handleCloseNavMenu(page.url)}
-                >
+                <MenuItem href="/category">
                   <Typography sx={{ textAlign: "center" }}>Category</Typography>
                 </MenuItem>
-                <MenuItem
-                  href="/about"
-                  // onClick={() => handleCloseNavMenu(page.url)}
-                >
+                <MenuItem href="/about">
                   <Typography sx={{ textAlign: "center" }}>About</Typography>
                 </MenuItem>
-                <MenuItem
-                  href="/contact"
-                  // onClick={() => handleCloseNavMenu(page.url)}
-                >
+                <MenuItem href="/contact">
                   <Typography sx={{ textAlign: "center" }}>Contact</Typography>
                 </MenuItem>
+                <MenuItem href="/myprofile">
+                  <Typography sx={{ textAlign: "center" }}>
+                    My Profile
+                  </Typography>
+                </MenuItem>
+                <MenuItem href="/myorders">
+                  <Typography sx={{ textAlign: "center" }}>
+                    My Orders
+                  </Typography>
+                </MenuItem>
+                <MenuItem href="/wishlist">
+                  <Typography sx={{ textAlign: "center" }}>Wishlist</Typography>
+                </MenuItem>
+                <MenuItem href="/addresses">
+                  <Typography sx={{ textAlign: "center" }}>
+                    Saved Addresses
+                  </Typography>
+                </MenuItem>
+                <MenuItem href="/notifications">
+                  <Typography sx={{ textAlign: "center" }}>
+                    Notifications
+                  </Typography>
+                </MenuItem>
+                {isLoggedIn ? (
+                  <MenuItem onClick={handleLogout} sx={{ color: "#EB001B" }}>
+                    <ListItemIcon
+                      sx={{
+                        color: "#EB001B",
+                        width: "16px",
+                        height: "16px",
+                      }}
+                    >
+                      <Logout fontSize="small" />
+                    </ListItemIcon>
+                    Logout
+                  </MenuItem>
+                ) : (
+                  <MenuItem sx={{ textAlign: "center" }}>
+                    {" "}
+                    <PrimaryButton text="Login" onClick={handleOpenLogin} />
+                  </MenuItem>
+                )}
               </Menu>
               <Image
                 src={monitoLogo}
@@ -310,6 +590,7 @@ const Header = () => {
           />
         </div>
       </Container>
+
       <Modal
         sx={{ padding: 0 }}
         open={open}
@@ -318,568 +599,72 @@ const Header = () => {
         aria-describedby="modal-modal-description"
       >
         <Stack
-          direction={"row"}
+          direction={{ xs: "column", md: "row" }}
           sx={{
             position: "absolute",
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 1200,
+            width: { xs: "100%", md: "980px", lg: "1200px" },
+            height: { xs: "100%", md: "fit-content" },
+            overflow: { xs: "auto", md: "none" },
             bgcolor: "background.paper",
-            borderRadius: "16px",
+            borderRadius: { md: "16px" },
             boxShadow: 24,
             p: 0,
           }}
         >
-          <div style={{ width: "50%" }}>
+          <Box sx={{ position: "relative", width: { xs: "100%", md: "50%" } }}>
+            <IconButton
+              aria-label="back button"
+              onClick={handleClose}
+              sx={{
+                display: {md: "none"},
+                position: "absolute",
+                zIndex: 2,
+                left: "23px",
+                top: "21px",
+                height: "7px",
+                width: "7px",
+              }}
+            >
+              <ArrowBackIosNewRoundedIcon />
+            </IconButton>
             <img
               src={"/authImage.png"}
               style={{
+                width: "100%",
                 height: "100%",
-                borderRadius: "16px 0 0 16px",
+                borderRadius: !isMobile ? "16px 0 0 16px" : "",
               }}
               alt="auth image"
             />
-          </div>
+          </Box>
           {/* LOGIN */}
           {authState === "login" && (
-            <Box
-              sx={{ padding: "21px", width: "50%" }}
-              className="login-section"
-            >
-              <div style={{ textAlign: "end" }}>
-                <IconButton
-                  aria-label="close"
-                  onClick={handleClose}
-                  sx={{
-                    height: "12px",
-                    width: "12px",
-                  }}
-                >
-                  <CloseRoundedIcon sx={{ color: "#757675" }} />
-                </IconButton>
-              </div>
-              <Stack spacing={3} sx={{ padding: "0 30px" }}>
-                <Image
-                  src={monitoLogo}
-                  alt="monito logo"
-                  width={115}
-                  height={40}
-                />
-                <div>
-                  <Typography sx={{ fontSize: "28px", fontWeight: "bold" }}>
-                    Login To Your Account
-                  </Typography>
-                  <Typography sx={{ mt: "10px", fontSize: "16px" }}>
-                    Please enter your email address to continue
-                  </Typography>
-                </div>
-                <FormControl variant="outlined">
-                  Email Address
-                  <OutlinedInput
-                    id="user-email"
-                    type="email"
-                    placeholder="Enter your email"
-                    startAdornment={
-                      <InputAdornment position="start">
-                        <EmailOutlinedIcon />
-                      </InputAdornment>
-                    }
-                    aria-describedby="user-email"
-                    inputProps={{
-                      "aria-label": "email",
-                    }}
-                    sx={{
-                      borderRadius: "8px",
-                      "&.Mui-focused .MuiSvgIcon-root": {
-                        color: "primary.main",
-                      },
-                    }}
-                  />
-                </FormControl>
-                <FormControl variant="outlined">
-                  Password
-                  <OutlinedInput
-                    id="user-email"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
-                    startAdornment={
-                      <InputAdornment position="start">
-                        <LockOutlinedIcon />
-                      </InputAdornment>
-                    }
-                    endAdornment={
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label={
-                            showPassword
-                              ? "hide the password"
-                              : "display the password"
-                          }
-                          onClick={handleClickShowPassword}
-                          onMouseDown={handleMouseDownPassword}
-                          onMouseUp={handleMouseUpPassword}
-                          edge="end"
-                        >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    }
-                    aria-describedby="user-password"
-                    inputProps={{
-                      "aria-label": "password",
-                    }}
-                    sx={{
-                      borderRadius: "8px",
-                      "&.Mui-focused .MuiSvgIcon-root": {
-                        color: "primary.main",
-                      },
-                    }}
-                  />
-                </FormControl>
-                <div>
-                  <Button
-                    variant={"contained"}
-                    onClick={() => console.log("Login clicked")}
-                    sx={{
-                      width: "100%",
-                      borderRadius: "8px",
-                      fontSize: { xs: "10px", md: "16px" },
-                      fontWeight: "bold",
-                      textTransform: "none",
-                      padding: "10px 29px",
-                    }}
-                  >
-                    Login
-                  </Button>
-                </div>
-                <Typography
-                  variant="body2"
-                  color="textSecondary"
-                  sx={{ mt: "12px !important", fontSize: "14px" }}
-                >
-                  By continuing, I agree to the{" "}
-                  <Link
-                    component="button"
-                    variant="body2"
-                    onClick={() => router.push("/terms-of-use")}
-                    sx={{
-                      textDecoration: "none",
-                      fontSize: 14,
-                      fontWeight: "bold",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Terms of Use
-                  </Link>{" "}
-                  &{" "}
-                  <Link
-                    component="button"
-                    variant="body2"
-                    onClick={() => router.push("/privacy-policy")}
-                    sx={{
-                      textDecoration: "none",
-                      fontSize: 14,
-                      fontWeight: "bold",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Privacy Policy
-                  </Link>
-                </Typography>
-                <div>
-                  <Typography
-                    variant="body2"
-                    color="textSecondary"
-                    sx={{
-                      mt: "0 !important",
-                      fontSize: "14px",
-                      textAlign: "center",
-                    }}
-                  >
-                    Don't have an account?{" "}
-                    <Link
-                      component="button"
-                      variant="body2"
-                      onClick={() => router.push("/Sign up")}
-                      sx={{
-                        textDecoration: "none",
-                        fontSize: 14,
-                        fontWeight: "bold",
-                        cursor: "pointer",
-                      }}
-                    >
-                      Sign Up
-                    </Link>
-                  </Typography>
-                </div>
-              </Stack>
-            </Box>
+            <LoginUser
+              loading={loading}
+              setLoading={setLoading}
+              handleClose={handleClose}
+              handleMouseDownPassword={handleMouseDownPassword}
+              handleMouseUpPassword={handleMouseUpPassword}
+              setAuthState={() => setAuthState("signup")}
+            />
           )}
           {/* SIGN UP */}
           {authState === "signup" && (
-            <Box
-              sx={{ padding: "21px", width: "50%" }}
-              className="signup-section"
-            >
-              <div style={{ textAlign: "end" }}>
-                <IconButton
-                  aria-label="close"
-                  onClick={handleClose}
-                  sx={{
-                    height: "12px",
-                    width: "12px",
-                  }}
-                >
-                  <CloseRoundedIcon sx={{ color: "#757675" }} />
-                </IconButton>
-              </div>
-              <Stack spacing={3} sx={{ padding: "0 30px" }}>
-                <Image
-                  src={monitoLogo}
-                  alt="monito logo"
-                  width={115}
-                  height={40}
-                />
-                <div>
-                  <Typography sx={{ fontSize: "28px", fontWeight: "bold" }}>
-                    Registration
-                  </Typography>
-                  <Typography sx={{ mt: "10px", fontSize: "16px" }}>
-                    Please enter your details to complete the registration
-                  </Typography>
-                </div>
-                <FormControl variant="outlined">
-                  Name
-                  <OutlinedInput
-                    id="user-name"
-                    type="text"
-                    placeholder="Enter your name"
-                    startAdornment={
-                      <InputAdornment position="start">
-                        <PersonOutlinedIcon />
-                      </InputAdornment>
-                    }
-                    aria-describedby="user-person"
-                    inputProps={{
-                      "aria-label": "person",
-                    }}
-                    sx={{
-                      borderRadius: "8px",
-                      "&.Mui-focused .MuiSvgIcon-root": {
-                        color: "primary.main",
-                      },
-                    }}
-                  />
-                </FormControl>
-                <FormControl variant="outlined">
-                  Email Address
-                  <OutlinedInput
-                    id="user-email"
-                    type="email"
-                    placeholder="Enter your email"
-                    startAdornment={
-                      <InputAdornment position="start">
-                        <EmailOutlinedIcon />
-                      </InputAdornment>
-                    }
-                    aria-describedby="user-email"
-                    inputProps={{
-                      "aria-label": "email",
-                    }}
-                    sx={{
-                      borderRadius: "8px",
-                      "&.Mui-focused .MuiSvgIcon-root": {
-                        color: "primary.main",
-                      },
-                    }}
-                  />
-                </FormControl>
-                <FormControl variant="outlined">
-                  Password
-                  <OutlinedInput
-                    id="user-password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
-                    startAdornment={
-                      <InputAdornment position="start">
-                        <LockOutlinedIcon />
-                      </InputAdornment>
-                    }
-                    endAdornment={
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label={
-                            showPassword
-                              ? "hide the password"
-                              : "display the password"
-                          }
-                          onClick={handleClickShowPassword}
-                          onMouseDown={handleMouseDownPassword}
-                          onMouseUp={handleMouseUpPassword}
-                          edge="end"
-                        >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    }
-                    aria-describedby="user-password"
-                    inputProps={{
-                      "aria-label": "password",
-                    }}
-                    sx={{
-                      borderRadius: "8px",
-                      "&.Mui-focused .MuiSvgIcon-root": {
-                        color: "primary.main",
-                      },
-                    }}
-                  />
-                </FormControl>
-                <FormControl variant="outlined">
-                  Confirm Password
-                  <OutlinedInput
-                    id="user-confirm-password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
-                    startAdornment={
-                      <InputAdornment position="start">
-                        <LockOutlinedIcon />
-                      </InputAdornment>
-                    }
-                    endAdornment={
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label={
-                            showPassword
-                              ? "hide the password"
-                              : "display the password"
-                          }
-                          onClick={handleClickShowPassword}
-                          onMouseDown={handleMouseDownPassword}
-                          onMouseUp={handleMouseUpPassword}
-                          edge="end"
-                        >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    }
-                    aria-describedby="user-confirm-password"
-                    inputProps={{
-                      "aria-label": "confirm password",
-                    }}
-                    sx={{
-                      borderRadius: "8px",
-                      "&.Mui-focused .MuiSvgIcon-root": {
-                        color: "primary.main",
-                      },
-                    }}
-                  />
-                </FormControl>
-                <div>
-                  <Button
-                    variant={"contained"}
-                    onClick={() => console.log("Sign up clicked")}
-                    sx={{
-                      width: "100%",
-                      borderRadius: "8px",
-                      fontSize: { xs: "10px", md: "16px" },
-                      fontWeight: "bold",
-                      textTransform: "none",
-                      padding: "10px 29px",
-                    }}
-                  >
-                    Sign Up
-                  </Button>
-                </div>
-                <Typography
-                  variant="body2"
-                  color="textSecondary"
-                  sx={{ mt: "12px !important", fontSize: "14px" }}
-                >
-                  By continuing, I agree to the{" "}
-                  <Link
-                    component="button"
-                    variant="body2"
-                    onClick={() => router.push("/terms-of-use")}
-                    sx={{
-                      textDecoration: "none",
-                      fontSize: 14,
-                      fontWeight: "bold",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Terms of Use
-                  </Link>{" "}
-                  &{" "}
-                  <Link
-                    component="button"
-                    variant="body2"
-                    onClick={() => router.push("/privacy-policy")}
-                    sx={{
-                      textDecoration: "none",
-                      fontSize: 14,
-                      fontWeight: "bold",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Privacy Policy
-                  </Link>
-                </Typography>
-                <div>
-                  <Typography
-                    variant="body2"
-                    color="textSecondary"
-                    sx={{
-                      mt: "0 !important",
-                      fontSize: "14px",
-                      textAlign: "center",
-                    }}
-                  >
-                    Already have an account?{" "}
-                    <Link
-                      component="button"
-                      variant="body2"
-                      onClick={() => router.push("/Login")}
-                      sx={{
-                        textDecoration: "none",
-                        fontSize: 14,
-                        fontWeight: "bold",
-                        cursor: "pointer",
-                      }}
-                    >
-                      Login
-                    </Link>
-                  </Typography>
-                </div>
-              </Stack>
-            </Box>
+            <RegisterUser
+              loading={loading}
+              setLoading={setLoading}
+              handleClose={handleClose}
+              handleMouseDownPassword={handleMouseDownPassword}
+              handleMouseUpPassword={handleMouseUpPassword}
+              setAuthState={setAuthState}
+            />
           )}
           {/* Email Verify */}
-          {authState === "email_verify" && (
-            <Box
-              sx={{ padding: "21px", height: "50%", width: "50%" }}
-              className="email-verify-section"
-            >
-              <div style={{ textAlign: "end" }}>
-                <IconButton
-                  aria-label="close"
-                  onClick={handleClose}
-                  sx={{
-                    height: "12px",
-                    width: "12px",
-                  }}
-                >
-                  <CloseRoundedIcon sx={{ color: "#757675" }} />
-                </IconButton>
-              </div>
-              <Stack spacing={3} sx={{ padding: "0 30px" }}>
-                <Image
-                  src={monitoLogo}
-                  alt="monito logo"
-                  width={115}
-                  height={40}
-                />
-                <div>
-                  <Typography sx={{ fontSize: "28px", fontWeight: "bold" }}>
-                    Verify your email
-                  </Typography>
-                  <Typography sx={{ mt: "10px", fontSize: "16px" }}>
-                    Please enter 4 digit OTP sent on email address
-                  </Typography>
-                  <Typography
-                    color="warning"
-                    sx={{ mt: "10px", fontSize: "16px" }}
-                  >
-                    <img
-                      src="/email_edit.svg"
-                      alt="email_edit"
-                      style={{ display: "inline" }}
-                    />
-                    <span>example@email.com</span>
-                  </Typography>
-                </div>
-                <Box sx={{ display: "flex", gap: 2 }}>
-                  {otp.map((digit, idx) => (
-                    <OutlinedInput
-                      key={idx}
-                      value={digit}
-                      onChange={(e) => handleChange(idx, e.target.value)}
-                      onKeyDown={(e) => handleBackspace(idx, e)}
-                      inputRef={(el) => (inputsRef.current[idx] = el!)}
-                      sx={{
-                        width: 60,
-                        height: 60,
-                        fontSize: "24px",
-                        borderRadius: "8px",
-                        boxShadow: "0px 3px 16px 0px #0000001A",
-                        backgroundColor: digit ? "#C7E5FA" : "transparent",
-                        transition: "background-color 0.2s",
-                        "& .MuiOutlinedInput-input": {
-                          padding: 0,
-                        },
-                        "& .MuiInputBase-input": {
-                          textAlign: "center",
-                        },
-                        "& .MuiOutlinedInput-notchedOutline": {
-                          border: "none",
-                        },
-                      }}
-                    />
-                  ))}
-                </Box>
-
-                <Button
-                  variant={"contained"}
-                  onClick={() => console.log("Login clicked")}
-                  sx={{
-                    width: "100%",
-                    borderRadius: "8px",
-                    fontSize: { xs: "10px", md: "16px" },
-                    fontWeight: "bold",
-                    textTransform: "none",
-                    padding: "10px 29px",
-                  }}
-                >
-                  Verify
-                </Button>
-
-                <Stack direction={"row"} justifyContent={"space-between"} >
-                  <Typography
-                    color="textSecondary"
-                    sx={{ fontSize: "14px" }}
-                    
-                  >
-                    Didn't get OTP
-                  </Typography>
-                  <Link
-                    component="button"
-                    variant="body2"
-                    onClick={() => console.log("Resend OTP")}
-                    sx={{
-                      textDecoration: "none",
-                      fontSize: 14,
-                      fontWeight: "bold",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Resend OTP
-                  </Link>
-                </Stack>
-                <div style={{ textAlign: "center" }}>
-                  <Button
-                    variant="text"
-                    sx={{
-                      fontSize: { xs: "10px", md: "16px" },
-                      fontWeight: "bold",
-                      textTransform: "none",
-                    }}
-                    startIcon={<ArrowBackIosNewRoundedIcon sx={{height: "14px",}} />}
-                  >
-                    Return to Login
-                  </Button>
-                </div>
-              </Stack>
-            </Box>
+          {authState === "otp_verify" && (
+            <OtpVerify handleClose={handleClose} setAuthState={setAuthState} />
           )}
         </Stack>
       </Modal>
