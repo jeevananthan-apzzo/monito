@@ -106,8 +106,7 @@ const Header = () => {
 
   const handleLogout = () => {
     localStorage.clear();
-    router.push("/");
-    router.reload();
+    window.location.href = "/";
   };
 
   const capitalizeFirst = (str: string): string =>
@@ -294,7 +293,7 @@ const Header = () => {
                         </MenuItem>
                         <Divider />
 
-                        <MenuItem onClick={() => router.push("/myprofile")}>
+                        <MenuItem onClick={() => router.push("/account")}>
                           <Avatar
                             sx={{
                               width: "16px",
@@ -319,7 +318,7 @@ const Header = () => {
                           component="li"
                           sx={{ marginTop: "0" }}
                         />
-                        <MenuItem onClick={() => router.push("/myorders")}>
+                        <MenuItem onClick={() => router.push("/account/myorders")}>
                           <Avatar
                             sx={{
                               width: "16px",
@@ -345,7 +344,7 @@ const Header = () => {
                           sx={{ marginTop: "0" }}
                         />
 
-                        <MenuItem onClick={() => router.push("/wishlist")}>
+                        <MenuItem onClick={() => router.push("/account/wishlist")}>
                           <Avatar
                             sx={{
                               width: "16px",
@@ -371,7 +370,7 @@ const Header = () => {
                           sx={{ marginTop: "0" }}
                         />
 
-                        <MenuItem onClick={() => router.push("/addresses")}>
+                        <MenuItem onClick={() => router.push("/account/addresses")}>
                           <Avatar
                             sx={{
                               width: "16px",
@@ -397,7 +396,7 @@ const Header = () => {
                           sx={{ marginTop: "0" }}
                         />
 
-                        <MenuItem onClick={() => router.push("/notifications")}>
+                        <MenuItem onClick={() => router.push("/account/notifications")}>
                           <Avatar
                             sx={{
                               width: "16px",
@@ -494,25 +493,25 @@ const Header = () => {
                 <MenuItem href="/contact">
                   <Typography sx={{ textAlign: "center" }}>Contact</Typography>
                 </MenuItem>
-                <MenuItem href="/myprofile">
+                <MenuItem href="/account">
                   <Typography sx={{ textAlign: "center" }}>
                     My Profile
                   </Typography>
                 </MenuItem>
-                <MenuItem href="/myorders">
+                <MenuItem href="/account/myorders">
                   <Typography sx={{ textAlign: "center" }}>
                     My Orders
                   </Typography>
                 </MenuItem>
-                <MenuItem href="/wishlist">
+                <MenuItem href="/account/wishlist">
                   <Typography sx={{ textAlign: "center" }}>Wishlist</Typography>
                 </MenuItem>
-                <MenuItem href="/addresses">
+                <MenuItem href="/account/addresses">
                   <Typography sx={{ textAlign: "center" }}>
                     Saved Addresses
                   </Typography>
                 </MenuItem>
-                <MenuItem href="/notifications">
+                <MenuItem href="/account/notifications">
                   <Typography sx={{ textAlign: "center" }}>
                     Notifications
                   </Typography>
@@ -576,7 +575,7 @@ const Header = () => {
             position: "absolute",
             bottom: "0",
             right: "0",
-            aspectRatio: "1/1",
+            aspectRatio: isMobile ? "5/4" : "1/1",
             borderRadius: "12px",
             overflow: "hidden",
           }}
