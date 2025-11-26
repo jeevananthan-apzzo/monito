@@ -41,7 +41,7 @@ import { product } from "..";
 
 export async function getStaticProps() {
   // const productDataRaw = await loadProducts();
-  const res = await fetch("https://fakestoreapi.com/products")
+  const res = await fetch(`${process.env.BASE_API}/products`)
   const productDataRaw = await res.json();
   console.log("getStaticProps", productDataRaw);
   

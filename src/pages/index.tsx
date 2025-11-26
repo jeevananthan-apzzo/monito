@@ -99,7 +99,8 @@ export type product = {
 export async function getStaticProps() {
 // export async function getServerSideProps() { 
   // const productDataRaw = await loadProducts();
-  const res = await fetch("https://fakestoreapi.com/products")
+  const res = await fetch(`${process.env.BASE_API}/products`)
+  console.log("API LOG", process.env.BASE_API);
   const productDataRaw = await res.json();
 
   const productData = Array.isArray(productDataRaw)
