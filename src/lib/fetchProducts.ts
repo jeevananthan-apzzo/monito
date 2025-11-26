@@ -4,7 +4,10 @@ import { GetServerSideProps, GetStaticPaths, GetStaticProps } from "next";
 import { loadProductById, loadProducts } from "./load_products";
 
 export type ProductProps = { productData: product[] };
-export type ProductDetailProps = { productDetail: product, allProducts: product[] };
+export type ProductDetailProps = {
+  productDetail: product;
+  allProducts: product[];
+};
 
 export const getProductServerSideProps: GetServerSideProps<
   ProductProps
@@ -14,12 +17,11 @@ export const getProductServerSideProps: GetServerSideProps<
   const productData = Array.isArray(productDataRaw)
     ? productDataRaw
     : productDataRaw && typeof productDataRaw === "object"
-      ? Object.values(productDataRaw)
-      : [];
+    ? Object.values(productDataRaw)
+    : [];
 
   return { props: { productData } };
 };
-
 
 // ---------- getStaticPaths (SAFER VERSION) ----------
 export const getProductStaticPaths: GetStaticPaths = async () => {
@@ -28,13 +30,13 @@ export const getProductStaticPaths: GetStaticPaths = async () => {
   const products = Array.isArray(productsRaw)
     ? productsRaw
     : productsRaw && typeof productsRaw === "object"
-      ? Object.values(productsRaw)
-      : [];
+    ? Object.values(productsRaw)
+    : [];
 
   if (!Array.isArray(productsRaw)) {
     console.warn(
       "⚠ loadProducts() did NOT return an array in getStaticPaths. " +
-      "Actual value:",
+        "Actual value:",
       productsRaw
     );
   }
@@ -43,10 +45,9 @@ export const getProductStaticPaths: GetStaticPaths = async () => {
     paths: products.map((p: product) => ({
       params: { product_id: String(p.id) },
     })),
-    fallback: false,
+    fallback: "blocking",
   };
 };
-
 
 // ---------- getStaticProps (SAFER VERSION) ----------
 export const getProductDetailStaticProps: GetStaticProps<
@@ -60,13 +61,13 @@ export const getProductDetailStaticProps: GetStaticProps<
   const allProducts = Array.isArray(allProductsRaw)
     ? allProductsRaw
     : allProductsRaw && typeof allProductsRaw === "object"
-      ? Object.values(allProductsRaw)
-      : [];
+    ? Object.values(allProductsRaw)
+    : [];
 
   if (!Array.isArray(allProductsRaw)) {
     console.warn(
       "⚠ loadProducts() did NOT return an array in getStaticProps. " +
-      "Actual value:",
+        "Actual value:",
       allProductsRaw
     );
   }
@@ -74,5 +75,6 @@ export const getProductDetailStaticProps: GetStaticProps<
   return {
     props: { productDetail, allProducts },
     revalidate: 60,
+    fallback: "blocking"
   };
 };
