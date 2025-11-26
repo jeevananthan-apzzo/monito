@@ -1,12 +1,12 @@
 import PrimaryButton from "@/custom components/PrimaryButton";
 import SectionTitle from "@/custom components/SectionTitle";
-import {
-  getProductDetailStaticProps,
-  getProductServerSideProps,
-  getProductStaticPaths,
-  ProductDetailProps,
-  ProductProps,
-} from "@/lib/fetchProducts";
+// import {
+//   getProductDetailStaticProps,
+//   getProductServerSideProps,
+//   getProductStaticPaths,
+//   ProductDetailProps,
+//   ProductProps,
+// } from "@/lib/fetchProducts";
 import {
   Box,
   Breadcrumbs,

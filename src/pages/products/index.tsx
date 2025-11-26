@@ -35,7 +35,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { InferGetServerSidePropsType } from "next";
 import PetCard from "@/components/PetCard";
-import { getProductServerSideProps, ProductProps } from "@/lib/fetchProducts";
+// import { getProductServerSideProps, ProductProps } from "@/lib/fetchProducts";
 import { loadProducts } from "@/lib/load_products";
 import { product } from "..";
 

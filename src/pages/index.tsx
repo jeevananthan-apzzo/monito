@@ -24,7 +24,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { loadProducts } from "@/lib/load_products";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { getProductServerSideProps, ProductProps } from "@/lib/fetchProducts";
+// import { getProductServerSideProps, ProductProps } from "@/lib/fetchProducts";
 
 // Font files can be colocated inside of `pages`
 
