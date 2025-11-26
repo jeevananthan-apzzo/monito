@@ -4,7 +4,7 @@ import { GetServerSideProps, GetStaticPaths, GetStaticProps } from "next";
 import { loadProductById, loadProducts } from "./load_products";
 
 export type ProductProps = { productData: product[] };
-export type ProductDetailProps = { productDetail: product };
+export type ProductDetailProps = { productDetail: product, allProducts: product[] };
 
 export const getProductServerSideProps: GetServerSideProps<
   ProductProps
@@ -18,7 +18,7 @@ export const getProductStaticPaths: GetStaticPaths = async () => {
   const products = await loadProducts();
 
   return {
-    paths: products.map((p:product) => ({
+    paths: products.map((p: product) => ({
       params: { product_id: String(p.id) },
     })),
     fallback: false, // or 'blocking'
@@ -32,8 +32,9 @@ export const getProductDetailStaticProps: GetStaticProps<
   const id = context.params?.product_id;
 
   const productDetail = await loadProductById(Number(id));
+  const allProducts = await loadProducts();
 
   return {
-    props: { productDetail },
+    props: { productDetail, allProducts }, revalidate: 60,
   };
 };

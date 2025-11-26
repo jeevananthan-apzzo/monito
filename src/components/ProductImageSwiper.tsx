@@ -1,90 +1,6 @@
-// import { Swiper, SwiperSlide } from "swiper/react";
-// import { Navigation, Pagination } from "swiper/modules";
-// import "swiper/css";
-// import "swiper/css/navigation";
-// import "swiper/css/pagination";
-
-// import { IconButton } from "@mui/material";
-// import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-// import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-
-// interface Props {
-//   images: string[];
-// }
-
-// export default function ProductImageSwiper({ images }: Props) {
-//   return (
-//     <div style={{ position: "relative", width: "100%",}}>
-//       {/* Navigation Buttons */}
-//       <IconButton
-//         className="swiper-button-prev"
-//         sx={{
-//           position: "absolute",
-//           top: "50%",
-//           left: "10px",
-//           zIndex: 10,
-//           backgroundColor: "white",
-//           "&:hover": { backgroundColor: "#eee" },
-//         }}
-//       >
-//         <ArrowBackIosNewIcon />
-//       </IconButton>
-
-//       <IconButton
-//         className="swiper-button-next"
-//         sx={{
-//           position: "absolute",
-//           top: "50%",
-//           right: "10px",
-//           zIndex: 10,
-//           backgroundColor: "white",
-//           "&:hover": { backgroundColor: "#eee" },
-//         }}
-//       >
-//         <ArrowForwardIosIcon />
-//       </IconButton>
-
-//       {/* Swiper */}
-//       <Swiper
-//         modules={[Navigation, Pagination]}
-//         navigation={{
-//           nextEl: ".swiper-button-next",
-//           prevEl: ".swiper-button-prev",
-//         }}
-//         pagination={{ clickable: true }}
-//         loop
-//         spaceBetween={20}
-//         slidesPerView={1}
-//         style={{ width: "100%", borderRadius: "10px" }}
-//       >
-//         {images.map((src, idx) => (
-//           <SwiperSlide key={idx}>
-//             <img
-//               src={src}
-//               alt={`Product image ${idx + 1}`}
-//               style={{
-//                 width: "100%",
-//                 height: "450px",
-//                 objectFit: "contain",
-//                 borderRadius: "10px",
-//                 backgroundColor: "#f9f9f9",
-//               }}
-//             />
-//           </SwiperSlide>
-//         ))}
-//       </Swiper>
-//     </div>
-//   );
-// }
-
 import { useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import {
-  Navigation,
-  Pagination,
-  Thumbs,
-  FreeMode,
-} from "swiper/modules";
+import { Navigation, Pagination, Thumbs, FreeMode } from "swiper/modules";
 
 import "swiper/css";
 import "swiper/css/navigation";
@@ -102,6 +18,7 @@ interface Props {
 
 export default function ProductImageSwiper({ images }: Props) {
   const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   return (
     <div style={{ width: "100%" }}>
@@ -146,6 +63,7 @@ export default function ProductImageSwiper({ images }: Props) {
           thumbs={{ swiper: thumbsSwiper }}
           spaceBetween={20}
           slidesPerView={1}
+          onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
         >
           {images.map((src, idx) => (
             <SwiperSlide key={idx}>
@@ -167,25 +85,40 @@ export default function ProductImageSwiper({ images }: Props) {
 
       {/* THUMBNAIL SWIPER */}
       <Swiper
+        className="thumbnail-swiper"
         modules={[FreeMode, Thumbs]}
         onSwiper={setThumbsSwiper}
         freeMode
         watchSlidesProgress
-        slidesPerView={5}   // show 5 thumbnails
+        slidesPerView={5} // show 5 thumbnails
         spaceBetween={10}
         style={{ marginTop: "15px" }}
       >
         {images.map((src, idx) => (
-          <SwiperSlide key={idx} style={{ cursor: "pointer" }}>
+          <SwiperSlide
+            className="thumbnail-swiper-img-container"
+            key={idx}
+            style={{
+              display:"flex",
+              justifyContent: "center",
+              alignItems: "center",
+              width: "67px !important",
+              height: "67px",
+              cursor: "pointer",
+              borderRadius: "6px",
+              border:
+                activeIndex === idx
+                  ? "2px solid #F1D092"
+                  : "2px solid transparent",
+            }}
+          >
             <img
               src={src}
               alt={`Thumb ${idx + 1}`}
               style={{
-                width: "100%",
-                height: "70px",
+                width: "67px !important",
+                height: "67px",
                 objectFit: "cover",
-                borderRadius: "8px",
-                border: "1px solid #ddd",
               }}
             />
           </SwiperSlide>

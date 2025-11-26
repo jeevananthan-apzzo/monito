@@ -59,8 +59,30 @@ body {
   gap: 0.5rem;
 }
 
+.swiper-pagination-bullet-active {
+  width: 22.5px !important;
+  border-radius: 7.5px !important;
+  background: #002a48 !important;
+}
+
+.swiper-pagination{
+  margin-top: 1rem !important;
+}
+
+.thumbnail-swiper-img-container{
+  width: 67px !important;
+}
+
+.d-none{
+  display: none;
+}
+
 @media (max-width: 768px) {
   .monito-header {
     background-image: url("/home_banner_mobile_bg.png");
+  }
+
+  .thumbnail-swiper{
+    padding-left: 1rem !important;
   }
 }
