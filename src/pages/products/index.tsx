@@ -51,6 +51,19 @@ export async function getStaticProps() {
   return { props: { productData } };
 }
 
+useEffect(() => {
+  const fetchProducts = async () => {
+    try {
+      const productDataRaw: product[] = await loadProducts();
+      console.log("allProducts", productDataRaw);
+    } catch (error) {
+      console.error("Failed to load products:", error);
+    }
+  };
+
+  fetchProducts();
+}, []);
+
 const index = ({ productData }: ProductProps) => {
   const [filteredData, setFilteredData] = useState<product[]>([]);
   const colors = [
