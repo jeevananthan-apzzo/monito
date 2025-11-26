@@ -37,8 +37,19 @@ import { InferGetServerSidePropsType } from "next";
 import { getServerSideProps, product } from "..";
 import PetCard from "@/components/PetCard";
 import { getProductServerSideProps, ProductProps } from "@/lib/fetchProducts";
+import { loadProducts } from "@/lib/load_products";
 
-export { getProductServerSideProps as getServerSideProps };
+export async function getStaticProps() {
+  const productDataRaw = await loadProducts();
+
+  const productData = Array.isArray(productDataRaw)
+    ? productDataRaw
+    : productDataRaw && typeof productDataRaw === "object"
+    ? Object.values(productDataRaw)
+    : [];
+
+  return { props: { productData } };
+}
 
 const index = ({ productData }: ProductProps) => {
   const [filteredData, setFilteredData] = useState<product[]>([]);
@@ -235,7 +246,7 @@ const index = ({ productData }: ProductProps) => {
         </Box>
       </Box>
       <Grid container m={"1rem 0"} columnSpacing={3}>
-        <Grid size={4} sx={{display: {xs: "none", md: "grid"}}}>
+        <Grid size={4} sx={{ display: { xs: "none", md: "grid" } }}>
           <Stack spacing={2}>
             <SectionTitle text="Filter" />
             <div>
@@ -251,9 +262,7 @@ const index = ({ productData }: ProductProps) => {
               <FormGroup>
                 <FormControlLabel
                   value={"men's clothing"}
-                  control={
-                    <Checkbox onChange={handleCategoryChange} />
-                  }
+                  control={<Checkbox onChange={handleCategoryChange} />}
                   label="Men's Clothing"
                 />
                 <FormControlLabel
@@ -449,7 +458,7 @@ const index = ({ productData }: ProductProps) => {
           </Stack>
         </Grid>
         <Grid
-          size={{xs: 12, md:8}}
+          size={{ xs: 12, md: 8 }}
           sx={{ display: "flex", flexDirection: "column", rowGap: "1rem" }}
         >
           <Stack direction={"row"} sx={{ alignItems: "center" }}>

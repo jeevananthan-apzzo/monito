@@ -34,9 +34,45 @@ import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRound
 import PetCard from "@/components/PetCard";
 import { product } from "..";
 import { useRouter } from "next/router";
+import { loadProductById, loadProducts } from "@/lib/load_products";
+import { GetStaticProps } from "next";
 
-export const getStaticPaths = getProductStaticPaths;
-export const getStaticProps = getProductDetailStaticProps;
+export async function getStaticPaths() {
+  const productsRaw = await loadProducts();
+
+  const products = Array.isArray(productsRaw)
+    ? productsRaw
+    : productsRaw && typeof productsRaw === "object"
+    ? Object.values(productsRaw)
+    : [];
+
+  return {
+    paths: products.map((p: product) => ({
+      params: { product_id: String(p.id) },
+    })),
+    fallback: false,
+  };
+}
+
+export const getStaticProps: GetStaticProps<ProductDetailProps> = async (
+  context
+) => {
+  const id = context.params?.product_id;
+
+  const productDetail = await loadProductById(Number(id));
+
+  const allProductsRaw = await loadProducts();
+  const allProducts = Array.isArray(allProductsRaw)
+    ? allProductsRaw
+    : allProductsRaw && typeof allProductsRaw === "object"
+    ? Object.values(allProductsRaw)
+    : [];
+
+  return {
+    props: { productDetail, allProducts },
+    revalidate: 60,
+  };
+};
 
 const productDetail = ({ productDetail, allProducts }: ProductDetailProps) => {
   const router = useRouter();
@@ -79,7 +115,7 @@ const productDetail = ({ productDetail, allProducts }: ProductDetailProps) => {
             width: "7px",
           }}
         >
-          <ArrowBackIosNewRoundedIcon sx={{color: "#D8D6D6"}}/>
+          <ArrowBackIosNewRoundedIcon sx={{ color: "#D8D6D6" }} />
         </IconButton>
         <ProductImageSwiper
           images={[
