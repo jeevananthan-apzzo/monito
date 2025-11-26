@@ -96,8 +96,8 @@ export type product = {
   image: URL | string;
 };
 
-// export async function getStaticProps() {
-export async function getServerSideProps() { 
+export async function getStaticProps() {
+// export async function getServerSideProps() { 
   const productDataRaw = await loadProducts();
 
   const productData = Array.isArray(productDataRaw)
@@ -105,6 +105,10 @@ export async function getServerSideProps() {
     : productDataRaw && typeof productDataRaw === "object"
     ? Object.values(productDataRaw)
     : [];
+
+    console.log(productDataRaw);
+    console.log("Home Server props", productData);
+    
 
   return { props: { productData } };
 }
