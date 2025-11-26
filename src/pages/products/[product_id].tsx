@@ -20,7 +20,7 @@ import {
   Typography,
 } from "@mui/material";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 // Import Swiper styles
 import "swiper/css";
@@ -34,12 +34,80 @@ import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRound
 import PetCard from "@/components/PetCard";
 import { product } from "..";
 import { useRouter } from "next/router";
+import { loadProductById, loadProducts } from "@/lib/load_products";
+import { GetStaticProps } from "next";
+import { useParams } from "next/navigation";
 
-export const getStaticPaths = getProductStaticPaths;
-export const getStaticProps = getProductDetailStaticProps;
+// export async function getStaticPaths() {
+//   const productsRaw = await loadProducts();
+//   console.log("getStaticPaths");
 
-const productDetail = ({ productDetail, allProducts }: ProductDetailProps) => {
+//   const products = Array.isArray(productsRaw)
+//     ? productsRaw
+//     : productsRaw && typeof productsRaw === "object"
+//     ? Object.values(productsRaw)
+//     : [];
+
+//   return {
+//     paths: products.map((p: product) => ({
+//       params: { product_id: String(p.id) },
+//     })),
+//     fallback: false,
+//   };
+// }
+
+// export const getStaticProps: GetStaticProps<ProductDetailProps> = async (
+//   context
+// ) => {
+//   const id = context.params?.product_id;
+
+//   const productDetail = await loadProductById(Number(id));
+
+//   const allProductsRaw = await loadProducts();
+//   const allProducts = Array.isArray(allProductsRaw)
+//     ? allProductsRaw
+//     : allProductsRaw && typeof allProductsRaw === "object"
+//     ? Object.values(allProductsRaw)
+//     : [];
+
+//   return {
+//     props: { productDetail, allProducts },
+//     revalidate: 60,
+//   };
+// };
+
+const productDetail = () => {
   const router = useRouter();
+  const params = useParams();
+  const { product_id } = router.query;
+
+  const [loading, setLoading] = useState(true);
+  const [allProducts, setAllProducts] = useState<product[]>([]);
+  const [productDetail, setProductDetail] = useState<product>({
+    id: 0,
+    title: "",
+    price: 0,
+    description: "",
+    category: "",
+    image: "",
+  });
+
+  const fetchProducts = async () => {
+    const rawData: product[] = await loadProducts();
+    setAllProducts(rawData);
+    setLoading(false);
+  };
+  const fetchProductById = async () => {
+    // const { product_id } = params;
+    const data: product = await loadProductById(Number(product_id));
+    setProductDetail(data);
+    fetchProducts();
+  };
+
+  useEffect(() => {
+    if (!product_id) return;
+    fetchProductById();
+  }, [product_id]);
 
   const ProductInfoText = ({ text }: { text: String }) => {
     return (
@@ -79,7 +147,7 @@ const productDetail = ({ productDetail, allProducts }: ProductDetailProps) => {
             width: "7px",
           }}
         >
-          <ArrowBackIosNewRoundedIcon sx={{color: "#D8D6D6"}}/>
+          <ArrowBackIosNewRoundedIcon sx={{ color: "#D8D6D6" }} />
         </IconButton>
         <ProductImageSwiper
           images={[
@@ -488,28 +556,32 @@ const productDetail = ({ productDetail, allProducts }: ProductDetailProps) => {
             <SectionTitle text="See More Products" />
           </Box>
 
-          <Grid container spacing={2} marginTop={2.8}>
-            {allProducts.length > 0 ? (
-              allProducts
-                .filter((p) => p.id !== productDetail.id)
-                .slice(0, 4)
-                .map((item: product) => (
-                  <Grid key={item.id} size={{ xs: 6, md: 4, lg: 3 }}>
-                    <PetCard
-                      key={item.id}
-                      id={item.id}
-                      title={item.title}
-                      image={item.image}
-                      price={item.price}
-                      category={item.category}
-                      description={item.description}
-                    />
-                  </Grid>
-                ))
-            ) : (
-              <Typography>Nothing to show</Typography>
-            )}
-          </Grid>
+          {loading && <Typography textAlign={"center"}>Loading...</Typography>}
+
+          {!loading && (
+            <Grid container spacing={2} marginTop={2.8}>
+              {allProducts.length > 0 ? (
+                allProducts
+                  .filter((p) => p.id !== productDetail.id)
+                  .slice(0, 4)
+                  .map((item: product) => (
+                    <Grid key={item.id} size={{ xs: 6, md: 4, lg: 3 }}>
+                      <PetCard
+                        key={item.id}
+                        id={item.id}
+                        title={item.title}
+                        image={item.image}
+                        price={item.price}
+                        category={item.category}
+                        description={item.description}
+                      />
+                    </Grid>
+                  ))
+              ) : (
+                <Typography>Nothing to show</Typography>
+              )}
+            </Grid>
+          )}
         </Box>
       </Container>
     </>
