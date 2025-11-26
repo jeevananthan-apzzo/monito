@@ -69,14 +69,14 @@ const PetCard = ({
         <Typography
           sx={{
             fontWeight: "bold",
-            fontSize: "16px",
+            fontSize: {xs: "12px", md: "16px"},
             lineHeight: "24px",
             display: "-webkit-box",
-            WebkitLineClamp: 2,
+            WebkitLineClamp: {xs:1, md: 1, lg: 2},
             WebkitBoxOrient: "vertical",
             overflow: "hidden",
             textOverflow: "ellipsis",
-            minHeight: {xs: "24px", md: "48px"},
+            height: {xs: "18px", md: "20px", lg: "48px"},
           }}
         >
           {title}
@@ -85,7 +85,7 @@ const PetCard = ({
           sx={{
             color: "#667479",
             fontWeight: "bold",
-            fontSize: "12px",
+            fontSize: {xs: "10px", md: "12px"},
             lineHeight: "18px",
           }}
         >
@@ -95,7 +95,7 @@ const PetCard = ({
         <Typography
           sx={{
             fontWeight: "bold",
-            fontSize: "14px",
+            fontSize: {xs: "12px", md: "14px"},
             lineHeight: "20px",
           }}
         >

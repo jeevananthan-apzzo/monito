@@ -129,7 +129,7 @@ export default function Home({
           </Stack>
           <Grid container spacing={2} marginTop={2.8}>
             {productData.length > 0 ?
-              productData.slice(0, 13).map((item: product) => (
+              productData.slice(0, 12).map((item: product) => (
                 <Grid key={item.id} size={{ xs: 6, md: 4, lg: 3 }}>
                   <PetCard
                     key={item.id}

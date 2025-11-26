@@ -1,8 +1,9 @@
 import React from 'react'
+import AccountContent from './[section]'
 
 const index = () => {
   return (
-    <div>My Profile</div>
+    <AccountContent/>
   )
 }
 

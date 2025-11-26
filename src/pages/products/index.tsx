@@ -143,7 +143,7 @@ const index = ({ productData }: ProductProps) => {
             xs: ' url("/all_products_mobile_banner_bg.png")',
             md: ' url("/all_products_banner_dogs_1.png")',
           },
-          padding: { xs: "", md: "60px 85px" },
+          padding: { xs: "", md: "50px 75px", lg: "60px 85px" },
           height: "378px",
           position: "relative",
           backgroundRepeat: "no-repeat",
@@ -164,7 +164,7 @@ const index = ({ productData }: ProductProps) => {
             <Typography
               sx={{
                 color: { md: "#FDFDFD" },
-                fontSize: { xs: "28px", md: "42px" },
+                fontSize: { xs: "28px", lg: "42px" },
                 fontWeight: "700",
               }}
             >
@@ -173,7 +173,7 @@ const index = ({ productData }: ProductProps) => {
             <Typography
               sx={{
                 color: { md: "#FDFDFD" },
-                fontSize: { xs: "20px", md: "28px" },
+                fontSize: { xs: "20px", lg: "28px" },
                 fontWeight: "700",
               }}
             >
@@ -185,7 +185,7 @@ const index = ({ productData }: ProductProps) => {
             sx={{
               color: { md: "#CCD1D2" },
               mt: "0.8rem",
-              fontSize: { xs: "12px", md: "14px" },
+              fontSize: { xs: "12px", lg: "14px" },
               fontWeight: "400",
             }}
           >
@@ -206,7 +206,7 @@ const index = ({ productData }: ProductProps) => {
               variant={"outlined"}
               sx={{
                 borderRadius: "57px",
-                fontSize: { xs: "10px", md: "16px" },
+                fontSize: { xs: "10px", lg: "16px" },
                 fontWeight: "bold",
                 textTransform: "none",
                 padding: "10px 29px",
@@ -221,7 +221,7 @@ const index = ({ productData }: ProductProps) => {
               variant={"contained"}
               sx={{
                 borderRadius: "57px",
-                fontSize: { xs: "10px", md: "16px" },
+                fontSize: { xs: "10px", lg: "16px" },
                 fontWeight: "bold",
                 textTransform: "none",
                 padding: "10px 29px",
@@ -489,7 +489,7 @@ const index = ({ productData }: ProductProps) => {
             {productData.length > 0 ? (
               filteredData.length > 0 ? (
                 filteredData
-                  .slice(page * 15 - 15, page * 15)
+                  .slice(page * 12 - 12, page * 12)
                   .map((item: product) => (
                     <Grid key={item.id} size={{ xs: 6, md: 4 }}>
                       <PetCard
