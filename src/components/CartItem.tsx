@@ -8,38 +8,30 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 
-import RemoveRoundedIcon from '@mui/icons-material/RemoveRounded';
-import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded";
+import AddRoundedIcon from "@mui/icons-material/AddRounded";
+import { product } from "@/pages";
+import { CartItem as CartItemType } from "@/pages/cart";
 
-const deliveryStatus = {
-  delivered: {
-    color: "#05A143",
-    icon: "/delivered.svg",
-  },
-  cancelled: {
-    color: "#EF3349",
-    icon: "/cancelled.svg",
-  },
-  shipped: {
-    color: "#4685DF",
-    icon: "/shipped.svg",
-  },
-  placed: {
-    color: "#A260EA",
-    icon: "/placed.svg",
-  },
-};
-
-const CartItem = () => {
+const CartItem = ({
+  id,
+  title,
+  price,
+  description,
+  category,
+  image,
+  quantity,
+}: CartItemType) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const [qty, setQuantity] = useState(quantity);
   return (
     <>
       <Stack direction={"row"} sx={{ alignItems: "center" }}>
         <img
-          src="/product.png"
+          src={image ? image.toString() : "/product.png"}
           alt="product_img"
           style={{ width: isMobile ? 70 : 130, height: isMobile ? 70 : 130 }}
         />
@@ -68,7 +60,7 @@ const CartItem = () => {
                 maxWidth: "80%",
               }}
             >
-              Reflex Plus Adult Cat Food Salmon
+              {title}
             </Typography>
             <Typography
               sx={{
@@ -78,7 +70,7 @@ const CartItem = () => {
                 maxWidth: "80%",
               }}
             >
-              {`Category: Men's Clothing`}
+              {`Category: ${category}`}
               <span style={{ margin: "0 0.5rem" }}>.</span> {`Qty: 2kg`}
             </Typography>
             <Typography
@@ -89,16 +81,50 @@ const CartItem = () => {
                 maxWidth: "80%",
               }}
             >
-              ₹199.00
+              {`₹${price}`}
             </Typography>
           </div>
 
-              <OutlinedInput  sx={{width: "115px", height: "42px"}} startAdornment={
-                <IconButton sx={{width: 30, height: 30, padding: "5px", borderRadius: "8px", bgcolor: "#CDCDCD"}}>
-                  <RemoveRoundedIcon sx={{color: "#fff"}}/>
-                </IconButton>
-              }/>
-
+          <OutlinedInput
+            value={qty}
+            onChange={(e) => setQuantity(Number(e.target.value))}
+            sx={{
+              width: "114px",
+              height: "40px",
+              "& .MuiOutlinedInput-notchedOutline": { borderRadius: "8px" },
+              "& .MuiInputBase-input": { textAlign: "center" },
+            }}
+            startAdornment={
+              <IconButton
+                sx={{
+                  width: 28,
+                  height: 28,
+                  padding: "5px",
+                  borderRadius: "8px",
+                  bgcolor: "#CDCDCD",
+                }}
+                disableRipple
+                onClick={() => setQuantity((prev) => prev - 1)}
+              >
+                <RemoveRoundedIcon sx={{ color: "#fff" }} />
+              </IconButton>
+            }
+            endAdornment={
+              <IconButton
+                sx={{
+                  width: 28,
+                  height: 28,
+                  padding: "5px",
+                  borderRadius: "8px",
+                  bgcolor: { xs: "#0F61D7", md: "#191A19" },
+                }}
+                disableRipple
+                onClick={() => setQuantity((prev) => prev + 1)}
+              >
+                <AddRoundedIcon sx={{ color: "#fff" }} />
+              </IconButton>
+            }
+          />
         </Box>
         <Box
           sx={{
@@ -108,28 +134,18 @@ const CartItem = () => {
             justifyContent: "space-between",
           }}
         >
-          <Typography
-            sx={{
-              color: deliveryStatus.delivered.color,
-              fontWeight: "600",
-              fontSize: { xs: "10px", md: "16px" },
-              whiteSpace: "nowrap",
-              verticalAlign: "middle",
-            }}
-          >
+          <IconButton>
             <img
-              src={deliveryStatus.delivered.icon}
-              alt="order status"
+              src={"/delete.svg"}
+              alt="delete"
               style={{
-                width: 13,
-                height: 13,
+                width: 15,
+                height: 15,
                 marginRight: "8px",
                 display: "inline-block", // make it inline
-                verticalAlign: "middle",
               }}
             />
-            Order Delivered
-          </Typography>
+          </IconButton>
         </Box>
       </Stack>
       <Divider />

@@ -11,10 +11,10 @@ export default function App({ Component, pageProps }: AppProps) {
   const { productData, ...rest } = pageProps;
   
   return (
-    // <ContextProvider productData={productData}>
+    <ContextProvider>
       <Layout>
         <Component {...pageProps} />
       </Layout>
-    // </ContextProvider>
+    </ContextProvider>
   );
 }

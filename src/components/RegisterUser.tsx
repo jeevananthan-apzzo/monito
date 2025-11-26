@@ -139,7 +139,7 @@ const RegisterUser = ({
         // API returns token
         localStorage.setItem(
           "user",
-          JSON.stringify({ username: username, token: "sign up login" })
+          JSON.stringify({ username: username, userId: data.id, token: "sign up login" })
         );
         setTimeout(() => {
           setAuthState("otp_verify");
