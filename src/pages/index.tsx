@@ -96,12 +96,22 @@ export type product = {
   image: URL | string;
 };
 
-export {getProductServerSideProps as getServerSideProps};
-export default function Home({
-  productData,
-  }: ProductProps) {
+export async function getStaticProps() {
+  const productDataRaw = await loadProducts();
+
+  const productData = Array.isArray(productDataRaw)
+    ? productDataRaw
+    : productDataRaw && typeof productDataRaw === "object"
+    ? Object.values(productDataRaw)
+    : [];
+
+  return { props: { productData } };
+}
+
+export default function Home({ productData }: ProductProps) {
   // export default function Home(productData = []) {
   const router = useRouter();
+  
   return (
     <Stack spacing={2} alignItems={"center"}>
       <Container maxWidth="xl" sx={{ paddingTop: "3rem" }}>
@@ -123,12 +133,12 @@ export default function Home({
               <ImageButtonWithEndIcon
                 text="View more"
                 endIcon={<ChevronRightOutlinedIcon />}
-                onClick = {() => router.push("/products")}
+                onClick={() => router.push("/products")}
               />
             </Box>
           </Stack>
           <Grid container spacing={2} marginTop={2.8}>
-            {productData.length > 0 ?
+            {productData.length > 0 ? (
               productData.slice(0, 12).map((item: product) => (
                 <Grid key={item.id} size={{ xs: 6, md: 4, lg: 3 }}>
                   <PetCard
@@ -141,7 +151,10 @@ export default function Home({
                     description={item.description}
                   />
                 </Grid>
-              )) : <Typography>Nothing to show</Typography>}
+              ))
+            ) : (
+              <Typography>Nothing to show</Typography>
+            )}
           </Grid>
           <Box sx={{ display: { xs: "block", md: "none" }, mt: "1rem" }}>
             <ImageButtonWithEndIcon

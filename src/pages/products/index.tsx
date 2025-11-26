@@ -34,10 +34,10 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { InferGetServerSidePropsType } from "next";
-import { getServerSideProps, product } from "..";
 import PetCard from "@/components/PetCard";
 import { getProductServerSideProps, ProductProps } from "@/lib/fetchProducts";
 import { loadProducts } from "@/lib/load_products";
+import { product } from "..";
 
 export async function getStaticProps() {
   const productDataRaw = await loadProducts();
@@ -51,18 +51,7 @@ export async function getStaticProps() {
   return { props: { productData } };
 }
 
-useEffect(() => {
-  const fetchProducts = async () => {
-    try {
-      const productDataRaw: product[] = await loadProducts();
-      console.log("allProducts", productDataRaw);
-    } catch (error) {
-      console.error("Failed to load products:", error);
-    }
-  };
 
-  fetchProducts();
-}, []);
 
 const index = ({ productData }: ProductProps) => {
   const [filteredData, setFilteredData] = useState<product[]>([]);
