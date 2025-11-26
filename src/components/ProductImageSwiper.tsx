@@ -68,7 +68,7 @@ export default function ProductImageSwiper({ images }: Props) {
           {images.map((src, idx) => (
             <SwiperSlide key={idx}>
               <img
-                src={src}
+                src={src }
                 alt={`Image ${idx + 1}`}
                 style={{
                   width: "100%",

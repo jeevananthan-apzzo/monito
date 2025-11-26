@@ -1,12 +1,9 @@
+import { product } from "@/pages";
+
 export async function loadProducts() {
   // Call an external API endpoint to get products
   try {
-    const res = await fetch("https://fakestoreapi.com/products", {
-      headers: {
-        "User-Agent": "Mozilla/5.0", // ← THIS FIXES NETLIFY
-        Accept: "application/json",
-      },
-    });
+    const res = await fetch(`https://fakestoreapi.com/products`);
 
     const data = await res.json();
     return data;
@@ -26,3 +23,5 @@ export async function loadProductById(id: number) {
     return error;
   }
 }
+
+

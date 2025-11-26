@@ -22,7 +22,7 @@ import PrimaryButton from "@/custom components/PrimaryButton";
 import ProductCard from "@/components/ProductCard";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { loadProducts } from "@/lib/load_products";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { getProductServerSideProps, ProductProps } from "@/lib/fetchProducts";
 
@@ -96,40 +96,41 @@ export type product = {
   image: URL | string;
 };
 
-export async function getStaticProps() {
-// export async function getServerSideProps() { 
-  // const productDataRaw = await loadProducts();
-  const res = await fetch(`${process.env.BASE_API}/products`)
-  console.log("API LOG", process.env.BASE_API);
-  const productDataRaw = await res.json();
+// export async function getStaticProps() {
+// // export async function getServerSideProps() {
+//   // const productDataRaw = await loadProducts();
+//   const res = await fetch(`${process.env.BASE_API}/products`)
+//   console.log("API LOG", process.env.BASE_API);
+//   const productDataRaw = await res.json();
 
-  const productData = Array.isArray(productDataRaw)
-    ? productDataRaw
-    : productDataRaw && typeof productDataRaw === "object"
-    ? Object.values(productDataRaw)
-    : [];
+//   const productData = Array.isArray(productDataRaw)
+//     ? productDataRaw
+//     : productDataRaw && typeof productDataRaw === "object"
+//     ? Object.values(productDataRaw)
+//     : [];
 
-    console.log(productDataRaw);
-    console.log("Home Server props", productData);
-    
+//   return { props: { productData } };
+// }
 
-  return { props: { productData } };
-}
-
-export default function Home({ productData }: ProductProps) {
+export default function Home() {
   // export default function Home(productData = []) {
   const router = useRouter();
+  const [loading, setLoading] = useState(true);
+
+  const [productData, setProductData] = useState<product[]>([]);
+
+  const fetchProducts = async () => {
+    try {
+      const rawData: product[] = await loadProducts();
+      setProductData(rawData);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const productDataRaw: product[] = await loadProducts();
-        console.log("allProducts", productDataRaw);
-      } catch (error) {
-        console.error("Failed to load products:", error);
-      }
-    };
-
     fetchProducts();
   }, []);
 
@@ -158,25 +159,28 @@ export default function Home({ productData }: ProductProps) {
               />
             </Box>
           </Stack>
-          <Grid container spacing={2} marginTop={2.8}>
-            {productData.length > 0 ? (
-              productData.slice(0, 12).map((item: product) => (
-                <Grid key={item.id} size={{ xs: 6, md: 4, lg: 3 }}>
-                  <PetCard
-                    key={item.id}
-                    id={item.id}
-                    title={item.title}
-                    image={item.image}
-                    price={item.price}
-                    category={item.category}
-                    description={item.description}
-                  />
-                </Grid>
-              ))
-            ) : (
-              <Typography>Nothing to show</Typography>
-            )}
-          </Grid>
+          {loading && <Typography textAlign={"center"}>Loading...</Typography>}
+          {!loading && (
+            <Grid container spacing={2} marginTop={2.8}>
+              {productData.length > 0 ? (
+                productData.slice(0, 12).map((item: product) => (
+                  <Grid key={item.id} size={{ xs: 6, md: 4, lg: 3 }}>
+                    <PetCard
+                      key={item.id}
+                      id={item.id}
+                      title={item.title}
+                      image={item.image}
+                      price={item.price}
+                      category={item.category}
+                      description={item.description}
+                    />
+                  </Grid>
+                ))
+              ) : (
+                <Typography>Nothing to show</Typography>
+              )}
+            </Grid>
+          )}
           <Box sx={{ display: { xs: "block", md: "none" }, mt: "1rem" }}>
             <ImageButtonWithEndIcon
               text="View more"

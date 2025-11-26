@@ -39,24 +39,23 @@ import { getProductServerSideProps, ProductProps } from "@/lib/fetchProducts";
 import { loadProducts } from "@/lib/load_products";
 import { product } from "..";
 
-export async function getStaticProps() {
-  // const productDataRaw = await loadProducts();
-  const res = await fetch(`${process.env.BASE_API}/products`)
-  const productDataRaw = await res.json();
-  console.log("getStaticProps", productDataRaw);
-  
-  const productData = Array.isArray(productDataRaw)
-    ? productDataRaw
-    : productDataRaw && typeof productDataRaw === "object"
-    ? Object.values(productDataRaw)
-    : [];
+// export async function getStaticProps() {
+//   // const productDataRaw = await loadProducts();
+//   const res = await fetch(`${process.env.BASE_API}/products`)
+//   const productDataRaw = await res.json();
+//   console.log("getStaticProps", productDataRaw);
 
-  return { props: { productData } };
-}
+//   const productData = Array.isArray(productDataRaw)
+//     ? productDataRaw
+//     : productDataRaw && typeof productDataRaw === "object"
+//     ? Object.values(productDataRaw)
+//     : [];
 
+//   return { props: { productData } };
+// }
 
-
-const index = ({ productData }: ProductProps) => {
+const index = () => {
+  const [loading, setLoading] = useState(true);
   const [filteredData, setFilteredData] = useState<product[]>([]);
   const colors = [
     { label: "Green", value: "green", hex: "#4caf50" },
@@ -73,6 +72,18 @@ const index = ({ productData }: ProductProps) => {
   const [sortBy, setSortby] = useState<number>(1);
   const [minPrice, setMinPrice] = useState<number | null>(null);
   const [maxPrice, setMaxPrice] = useState<number | null>(null);
+  const [productData, setProductData] = useState<product[]>([]);
+
+  const fetchProducts = async () => {
+    try {
+      const rawData: product[] = await loadProducts();
+      setProductData(rawData);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
+  };
 
   const PrevIcon = () => (
     <img src={"/left_pg.svg"} alt="prev" style={{ width: 12, height: 12 }} />
@@ -116,6 +127,10 @@ const index = ({ productData }: ProductProps) => {
     );
   };
 
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
   //when filtering
   useEffect(() => {
     const tempFiltered = productData.filter((p) => {
@@ -131,7 +146,7 @@ const index = ({ productData }: ProductProps) => {
     });
 
     setFilteredData(tempFiltered);
-  }, [category, minPrice, maxPrice]);
+  }, [productData, category, minPrice, maxPrice]);
 
   return (
     <Container maxWidth="xl">
@@ -499,62 +514,67 @@ const index = ({ productData }: ProductProps) => {
               </Select>
             </Box>
           </Stack>
-          <Grid flexGrow={1} container spacing={2}>
-            {productData.length > 0 ? (
-              filteredData.length > 0 ? (
-                filteredData
-                  .slice(page * 12 - 12, page * 12)
-                  .map((item: product) => (
-                    <Grid key={item.id} size={{ xs: 6, md: 4 }}>
-                      <PetCard
-                        key={item.id}
-                        id={item.id}
-                        title={item.title}
-                        image={item.image}
-                        price={item.price}
-                        category={item.category}
-                        description={item.description}
-                      />
-                    </Grid>
-                  ))
-              ) : (
-                <Typography>
-                  Nothing to show, Try with different filtering method
-                </Typography>
-              )
-            ) : (
-              <Typography>Nothing to show</Typography>
-            )}
-          </Grid>
-          <Box>
-            <Pagination
-              count={Math.ceil(filteredData.length / 15)}
-              page={page}
-              onChange={handlePageChange}
-              shape="rounded"
-              renderItem={(item) => (
-                <PaginationItem
-                  {...item}
-                  slots={{
-                    previous: PrevIcon,
-                    next: NextIcon,
+          {loading && <Typography textAlign={"center"}>Loading...</Typography>}
+          {!loading && (
+            <>
+              <Grid flexGrow={1} container spacing={2}>
+                {productData.length > 0 ? (
+                  filteredData.length > 0 ? (
+                    filteredData
+                      .slice(page * 12 - 12, page * 12)
+                      .map((item: product) => (
+                        <Grid key={item.id} size={{ xs: 6, md: 4 }}>
+                          <PetCard
+                            key={item.id}
+                            id={item.id}
+                            title={item.title}
+                            image={item.image}
+                            price={item.price}
+                            category={item.category}
+                            description={item.description}
+                          />
+                        </Grid>
+                      ))
+                  ) : (
+                    <Typography>
+                      Nothing to show, Try with different filtering method
+                    </Typography>
+                  )
+                ) : (
+                  <Typography>Nothing to show</Typography>
+                )}
+              </Grid>
+              <Box>
+                <Pagination
+                  count={Math.ceil(filteredData.length / 15)}
+                  page={page}
+                  onChange={handlePageChange}
+                  shape="rounded"
+                  renderItem={(item) => (
+                    <PaginationItem
+                      {...item}
+                      slots={{
+                        previous: PrevIcon,
+                        next: NextIcon,
+                      }}
+                    />
+                  )}
+                  sx={{
+                    "& .MuiPaginationItem-root": {
+                      fontSize: "16px",
+                      fontWeight: "bold",
+                      borderRadius: "8px",
+                    },
+                    "& .Mui-selected": {
+                      color: "#fdfdfd",
+                      bgcolor: "#002a48 !important",
+                    },
+                    "& .MuiPagination-ul": { justifyContent: "center" },
                   }}
                 />
-              )}
-              sx={{
-                "& .MuiPaginationItem-root": {
-                  fontSize: "16px",
-                  fontWeight: "bold",
-                  borderRadius: "8px",
-                },
-                "& .Mui-selected": {
-                  color: "#fdfdfd",
-                  bgcolor: "#002a48 !important",
-                },
-                "& .MuiPagination-ul": { justifyContent: "center" },
-              }}
-            />
-          </Box>
+              </Box>
+            </>
+          )}
         </Grid>
       </Grid>
     </Container>
