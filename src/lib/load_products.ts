@@ -1,9 +1,22 @@
 import { product } from "@/pages";
 
-export async function loadProducts() {
+export async function loadProducts(): Promise<product[]> {
   // Call an external API endpoint to get products
   try {
     const res = await fetch(`https://fakestoreapi.com/products`);
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}
+
+export async function loadCartProducts() {
+  // Call an external API endpoint to get products
+  try {
+    const res = await fetch(`https://fakestoreapi.com/carts`);
 
     const data = await res.json();
     return data;

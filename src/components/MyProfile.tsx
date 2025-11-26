@@ -18,12 +18,17 @@ import {
 import React, { useRef, useState } from "react";
 import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
 import PrimaryButton from "@/custom components/PrimaryButton";
+import { useProducts } from "@/context/AppContext";
 const MyProfile = () => {
   const nations = ["Indian", "Foreign countries"];
   const [countryCode, setCountryCode] = useState(91);
   const [nationality, setNationality] = useState("");
   const [gender, setGender] = useState("male");
 
+  const userData = useProducts().userData;
+
+  console.log("userData", userData);
+  
   const [date, setDate] = useState("");
   const hiddenDateInputRef = useRef<HTMLInputElement>(null);
 

@@ -54,7 +54,6 @@ const Header = () => {
   const [userDetails, setUserDetails] = useState<
     "" | { username: ""; token: "" }
   >("");
-  console.log(isLoggedIn);
 
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = React.useState(false);
@@ -229,6 +228,7 @@ const Header = () => {
                         aria-controls="cart-appbar"
                         aria-haspopup="true"
                         sx={{ textTransform: "none" }}
+                        onClick={() => router.push("/cart")}
                         startIcon={
                           <Image
                             src="/cart_icon.svg"
