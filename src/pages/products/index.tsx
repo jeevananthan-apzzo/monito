@@ -41,7 +41,8 @@ import { product } from "..";
 
 export async function getStaticProps() {
   const productDataRaw = await loadProducts();
-
+  console.log("getStaticProps");
+  
   const productData = Array.isArray(productDataRaw)
     ? productDataRaw
     : productDataRaw && typeof productDataRaw === "object"

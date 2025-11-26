@@ -96,7 +96,8 @@ export type product = {
   image: URL | string;
 };
 
-export async function getStaticProps() {
+// export async function getStaticProps() {
+export async function getServerSideProps() { 
   const productDataRaw = await loadProducts();
 
   const productData = Array.isArray(productDataRaw)

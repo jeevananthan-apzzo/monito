@@ -39,6 +39,7 @@ import { GetStaticProps } from "next";
 
 export async function getStaticPaths() {
   const productsRaw = await loadProducts();
+  console.log("getStaticPaths");
 
   const products = Array.isArray(productsRaw)
     ? productsRaw
