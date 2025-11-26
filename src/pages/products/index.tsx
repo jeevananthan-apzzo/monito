@@ -40,8 +40,10 @@ import { loadProducts } from "@/lib/load_products";
 import { product } from "..";
 
 export async function getStaticProps() {
-  const productDataRaw = await loadProducts();
-  console.log("getStaticProps");
+  // const productDataRaw = await loadProducts();
+  const res = await fetch("https://fakestoreapi.com/products")
+  const productDataRaw = await res.json();
+  console.log("getStaticProps", productDataRaw);
   
   const productData = Array.isArray(productDataRaw)
     ? productDataRaw

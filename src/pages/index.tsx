@@ -98,7 +98,9 @@ export type product = {
 
 export async function getStaticProps() {
 // export async function getServerSideProps() { 
-  const productDataRaw = await loadProducts();
+  // const productDataRaw = await loadProducts();
+  const res = await fetch("https://fakestoreapi.com/products")
+  const productDataRaw = await res.json();
 
   const productData = Array.isArray(productDataRaw)
     ? productDataRaw
