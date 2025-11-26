@@ -111,7 +111,20 @@ export async function getStaticProps() {
 export default function Home({ productData }: ProductProps) {
   // export default function Home(productData = []) {
   const router = useRouter();
-  
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const productDataRaw: product[] = await loadProducts();
+        console.log("allProducts", productDataRaw);
+      } catch (error) {
+        console.error("Failed to load products:", error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   return (
     <Stack spacing={2} alignItems={"center"}>
       <Container maxWidth="xl" sx={{ paddingTop: "3rem" }}>
